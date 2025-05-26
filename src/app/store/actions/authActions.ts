@@ -1,9 +1,13 @@
 import { Dispatch } from 'redux';
 import { authService, LoginData, RegisterData } from '../../services/authService';
-import { startAuth, loginSuccess, authFailure, logout as logoutAction } from '../slices/authSlice';
-
+import {
+  setCredentials as loginSuccess,
+  clearCredentials as logoutAction,
+  setLoading as startAuth,
+  setError as authFailure
+} from '../slices/authSlice';
 export const loginUser = (data: LoginData) => async (dispatch: Dispatch) => {
-    dispatch(startAuth());
+    dispatch(startAuth(true));
     try {
         const response = await authService.login(data);
         dispatch(loginSuccess({
@@ -22,7 +26,7 @@ export const loginUser = (data: LoginData) => async (dispatch: Dispatch) => {
 };
 
 export const registerUser = (data: RegisterData) => async (dispatch: Dispatch) => {
-    dispatch(startAuth());
+    dispatch(startAuth(true));
     try {
         const response = await authService.register(data);
         dispatch(loginSuccess({

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Providers } from './store/Providers';
+import { Providers } from "./store/Providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "NexusAcademic - Sistema de Gestión Académica",
-  description: "Sistema completo de gestión académica para instituciones educativas",
+  description: "Sistema de gestión académica para administrar cursos, estudiantes y profesores",
 };
 
 export default function RootLayout({
@@ -24,9 +24,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
       >
         <Providers>
           {children}

@@ -105,7 +105,7 @@ export const Sidebar = () => {
 
             <div id="nav" className="w-full px-6">
                 {filteredMenuItems.map(item => (
-                    <SidebarItemMenu key={item.path} {...item} />
+                    <SidebarItemMenu key={item.path} href={item.path} icon={item.icon} title={item.title} />
                 ))}
             </div>
 

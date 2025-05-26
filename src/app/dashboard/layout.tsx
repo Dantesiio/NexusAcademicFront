@@ -12,13 +12,13 @@ export default function DashboardLayout({
     children: React.ReactNode
 }) {
     const dispatch = useDispatch<AppDispatch>();
-    const { isAuthenticated, loading } = useSelector((state: RootState) => state.auth);
+    const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
     useEffect(() => {
-        if (!isAuthenticated && !loading) {
+        if (!isAuthenticated) {
             dispatch(checkAuthStatus());
         }
-    }, [dispatch, isAuthenticated, loading]);
+    }, [dispatch, isAuthenticated]);
 
     return (
         <ProtectedRoute>
