@@ -14,7 +14,18 @@ export interface CreateStudentData {
     }>;
 }
 
-export interface UpdateStudentData extends Partial<CreateStudentData> {}
+export interface UpdateStudentData {
+    name?: string;
+    age?: number;
+    email?: string;
+    gender?: string;
+    nickname?: string;
+    enrollments?: Array<{
+        courseId: string;
+        enrolledAt: string;
+        score?: number;
+    }>;
+}
 
 export interface StudentListParams {
     limit?: number;

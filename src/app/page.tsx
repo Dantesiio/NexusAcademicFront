@@ -1,37 +1,34 @@
 'use client'
-import { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { RootState, AppDispatch } from './store';
-import { checkAuthStatus } from './store/actions/authActions';
 
 export default function Home() {
   const router = useRouter();
-  const dispatch = useDispatch<AppDispatch>();
-  const { isAuthenticated, loading } = useSelector((state: RootState) => state.auth);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isClient) return;
+    
     const token = localStorage.getItem('token');
     if (token) {
-      dispatch(checkAuthStatus());
+      // Si hay token, ir al dashboard
+      router.push('/dashboard/main');
     } else {
+      // Si no hay token, ir al login
       router.push('/auth/login');
     }
-  }, [dispatch, router]);
-
-  useEffect(() => {
-    if (!loading) {
-      if (isAuthenticated) {
-        router.push('/dashboard/main');
-      } else {
-        router.push('/auth/login');
-      }
-    }
-  }, [isAuthenticated, loading, router]);
+  }, [router, isClient]);
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+    <div className="min-h-screen bg-black-100 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 mx-auto"></div>
+        <p className="mt-4 text-black-600">Cargando...</p>
+      </div>
     </div>
   );
 }

@@ -1,16 +1,17 @@
 import { Dispatch } from 'redux';
 import { authService, LoginData, RegisterData } from '../../services/authService';
 import {
-  setCredentials as loginSuccess,
-  clearCredentials as logoutAction,
-  setLoading as startAuth,
-  setError as authFailure
+  setCredentials,
+  clearCredentials,
+  setLoading,
+  setError
 } from '../slices/authSlice';
+
 export const loginUser = (data: LoginData) => async (dispatch: Dispatch) => {
-    dispatch(startAuth(true));
+    dispatch(setLoading(true));
     try {
         const response = await authService.login(data);
-        dispatch(loginSuccess({
+        dispatch(setCredentials({
             user: {
                 id: response.id,
                 email: response.email,
@@ -20,16 +21,17 @@ export const loginUser = (data: LoginData) => async (dispatch: Dispatch) => {
             },
             token: response.token
         }));
-    } catch (error: any) {
-        dispatch(authFailure(error.response?.data?.message || 'Error al iniciar sesión'));
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Error al iniciar sesión';
+        dispatch(setError(errorMessage));
     }
 };
 
 export const registerUser = (data: RegisterData) => async (dispatch: Dispatch) => {
-    dispatch(startAuth(true));
+    dispatch(setLoading(true));
     try {
         const response = await authService.register(data);
-        dispatch(loginSuccess({
+        dispatch(setCredentials({
             user: {
                 id: response.id,
                 email: response.email,
@@ -39,15 +41,24 @@ export const registerUser = (data: RegisterData) => async (dispatch: Dispatch) =
             },
             token: response.token
         }));
-    } catch (error: any) {
-        dispatch(authFailure(error.response?.data?.message || 'Error al registrar usuario'));
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Error al registrar usuario';
+        dispatch(setError(errorMessage));
     }
 };
 
 export const checkAuthStatus = () => async (dispatch: Dispatch) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    
+    if (!token) {
+        dispatch(clearCredentials());
+        return;
+    }
+
+    dispatch(setLoading(true));
     try {
         const response = await authService.checkStatus();
-        dispatch(loginSuccess({
+        dispatch(setCredentials({
             user: {
                 id: response.id,
                 email: response.email,
@@ -57,17 +68,17 @@ export const checkAuthStatus = () => async (dispatch: Dispatch) => {
             },
             token: response.token
         }));
-    } catch (error) {
-        dispatch(logoutAction());
+    } catch {
+        dispatch(clearCredentials());
     }
 };
 
 export const logoutUser = () => async (dispatch: Dispatch) => {
     try {
         await authService.logout();
-    } catch (error) {
+    } catch {
         // Even if logout fails on server, clear local state
     } finally {
-        dispatch(logoutAction());
+        dispatch(clearCredentials());
     }
 };

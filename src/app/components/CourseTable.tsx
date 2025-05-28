@@ -40,32 +40,32 @@ export const CourseTable = ({ courses, onEdit }: Props) => {
                         <div className="px-4 py-5 sm:p-6">
                             <div className="flex items-center justify-between">
                                 <div className="flex-1 min-w-0">
-                                    <h3 className="text-lg font-medium text-gray-900 truncate">
+                                    <h3 className="text-lg font-medium text-black-900 truncate">
                                         {course.name}
                                     </h3>
-                                    <p className="text-sm text-gray-500 font-mono">
+                                    <p className="text-sm text-black-500 font-mono">
                                         {course.code}
                                     </p>
                                 </div>
                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                                     course.status === 'ACTIVE' 
                                         ? 'bg-green-100 text-green-800' 
-                                        : 'bg-gray-100 text-gray-800'
+                                        : 'bg-black-100 text-black-800'
                                 }`}>
                                     {course.status}
                                 </span>
                             </div>
                             
-                            <p className="mt-2 text-sm text-gray-600 line-clamp-2">
+                            <p className="mt-2 text-sm text-black-600 line-clamp-2">
                                 {course.description}
                             </p>
                             
                             <div className="mt-4">
-                                <div className="flex items-center text-sm text-gray-500">
+                                <div className="flex items-center text-sm text-black-500">
                                     <IoCalendarOutline className="h-4 w-4 mr-1" />
                                     {formatDate(course.startDate)} - {formatDate(course.endDate)}
                                 </div>
-                                <div className="mt-1 text-sm text-gray-600">
+                                <div className="mt-1 text-sm text-black-600">
                                     <span className="font-medium">Profesor:</span> {course.teacher.fullName}
                                 </div>
                             </div>
@@ -73,7 +73,7 @@ export const CourseTable = ({ courses, onEdit }: Props) => {
                             <div className="mt-4 flex justify-end space-x-2">
                                 <button
                                     onClick={() => handleView(course)}
-                                    className="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
+                                    className="inline-flex items-center px-3 py-1.5 border border-black-300 shadow-sm text-xs font-medium rounded text-black-700 bg-white hover:bg-black-50"
                                 >
                                     <IoEyeOutline className="h-4 w-4 mr-1" />
                                     Ver

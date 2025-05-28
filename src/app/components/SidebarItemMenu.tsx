@@ -29,7 +29,7 @@ export function SidebarItemMenu({
         flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200
         ${isActive 
           ? 'bg-blue-100 text-blue-700 border-r-2 border-blue-700' 
-          : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+          : 'text-black-700 hover:bg-black-100 hover:text-black-900'
         }
         ${isCollapsed ? 'justify-center px-2' : 'justify-start'}
       `}

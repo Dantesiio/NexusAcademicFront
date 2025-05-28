@@ -7,7 +7,6 @@ import { SidebarItemMenu } from './SidebarItemMenu';
 import { 
     IoBrowsersOutline, 
     IoBookOutline, 
-    IoSchoolOutline, 
     IoDocumentTextOutline,
     IoPersonOutline,
     IoLogOutOutline,
@@ -21,9 +20,6 @@ export const Sidebar = () => {
     const handleLogout = () => {
         dispatch(logoutUser());
     };
-
-    const isAdmin = user?.roles.includes('admin') || user?.roles.includes('super-user');
-    const isTeacher = user?.roles.includes('teacher');
 
     const menuItems = [
         {
@@ -71,7 +67,7 @@ export const Sidebar = () => {
         <div
             style={{ width: '400px' }}
             id="menu" 
-            className="bg-gray-900 min-h-screen z-10 text-slate-300 w-64 left-0 h-screen overflow-y-scroll"
+            className="bg-black-900 min-h-screen z-10 text-slate-300 w-64 left-0 h-screen overflow-y-scroll"
         >
             <div id="logo" className="my-4 px-6">
                 <h1 className="text-lg md:text-2xl font-bold text-white">

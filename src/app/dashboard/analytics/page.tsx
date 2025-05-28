@@ -35,11 +35,11 @@ const MetricCard = ({ title, value, subtitle, icon, color, trend }: MetricCardPr
                 </div>
                 <div className="ml-5 w-0 flex-1">
                     <dl>
-                        <dt className="text-sm font-medium text-gray-500 truncate">
+                        <dt className="text-sm font-medium text-black-500 truncate">
                             {title}
                         </dt>
                         <dd className="flex items-baseline">
-                            <div className="text-2xl font-semibold text-gray-900">
+                            <div className="text-2xl font-semibold text-black-900">
                                 {value}
                             </div>
                             {trend !== undefined && (
@@ -54,7 +54,7 @@ const MetricCard = ({ title, value, subtitle, icon, color, trend }: MetricCardPr
                                 </div>
                             )}
                         </dd>
-                        <dd className="text-sm text-gray-500">
+                        <dd className="text-sm text-black-500">
                             {subtitle}
                         </dd>
                     </dl>
@@ -102,8 +102,8 @@ export default function AnalyticsPage() {
         <ProtectedRoute requiredRoles={['admin', 'teacher']}>
             <div className="p-6">
                 <div className="mb-8">
-                    <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
-                    <p className="text-gray-600">Panel de estadísticas y métricas del sistema</p>
+                    <h1 className="text-2xl font-bold text-black-900">Analytics</h1>
+                    <p className="text-black-600">Panel de estadísticas y métricas del sistema</p>
                 </div>
 
                 {/* Métricas principales */}
@@ -141,43 +141,43 @@ export default function AnalyticsPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Distribución de Calificaciones */}
                     <div className="bg-white shadow rounded-lg p-6">
-                        <h2 className="text-lg font-medium text-gray-900 mb-4">
+                        <h2 className="text-lg font-medium text-black-900 mb-4">
                             Distribución de Calificaciones
                         </h2>
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center">
                                     <div className="w-4 h-4 bg-green-500 rounded mr-2"></div>
-                                    <span className="text-sm text-gray-600">Excelente (4.5-5.0)</span>
+                                    <span className="text-sm text-black-600">Excelente (4.5-5.0)</span>
                                 </div>
-                                <span className="text-sm font-medium text-gray-900">
+                                <span className="text-sm font-medium text-black-900">
                                     {gradeDistribution.excellent} ({grades.length > 0 ? Math.round((gradeDistribution.excellent / grades.length) * 100) : 0}%)
                                 </span>
                             </div>
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center">
                                     <div className="w-4 h-4 bg-blue-500 rounded mr-2"></div>
-                                    <span className="text-sm text-gray-600">Bueno (3.5-4.4)</span>
+                                    <span className="text-sm text-black-600">Bueno (3.5-4.4)</span>
                                 </div>
-                                <span className="text-sm font-medium text-gray-900">
+                                <span className="text-sm font-medium text-black-900">
                                     {gradeDistribution.good} ({grades.length > 0 ? Math.round((gradeDistribution.good / grades.length) * 100) : 0}%)
                                 </span>
                             </div>
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center">
                                     <div className="w-4 h-4 bg-yellow-500 rounded mr-2"></div>
-                                    <span className="text-sm text-gray-600">Regular (3.0-3.4)</span>
+                                    <span className="text-sm text-black-600">Regular (3.0-3.4)</span>
                                 </div>
-                                <span className="text-sm font-medium text-gray-900">
+                                <span className="text-sm font-medium text-black-900">
                                     {gradeDistribution.regular} ({grades.length > 0 ? Math.round((gradeDistribution.regular / grades.length) * 100) : 0}%)
                                 </span>
                             </div>
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center">
                                     <div className="w-4 h-4 bg-red-500 rounded mr-2"></div>
-                                    <span className="text-sm text-gray-600">Deficiente (&lt;3.0)</span>
+                                    <span className="text-sm text-black-600">Deficiente (&lt;3.0)</span>
                                 </div>
-                                <span className="text-sm font-medium text-gray-900">
+                                <span className="text-sm font-medium text-black-900">
                                     {gradeDistribution.poor} ({grades.length > 0 ? Math.round((gradeDistribution.poor / grades.length) * 100) : 0}%)
                                 </span>
                             </div>
@@ -186,7 +186,7 @@ export default function AnalyticsPage() {
 
                     {/* Resumen de Cursos */}
                     <div className="bg-white shadow rounded-lg p-6">
-                        <h2 className="text-lg font-medium text-gray-900 mb-4">
+                        <h2 className="text-lg font-medium text-black-900 mb-4">
                             Resumen de Cursos
                         </h2>
                         <div className="space-y-4">
@@ -198,20 +198,20 @@ export default function AnalyticsPage() {
                                     : '-';
                                 
                                 return (
-                                    <div key={course.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+                                    <div key={course.id} className="flex items-center justify-between p-3 bg-black-50 rounded-md">
                                         <div>
-                                            <h3 className="text-sm font-medium text-gray-900">
+                                            <h3 className="text-sm font-medium text-black-900">
                                                 {course.name}
                                             </h3>
-                                            <p className="text-xs text-gray-500">
+                                            <p className="text-xs text-black-500">
                                                 {course.code} - {courseSubmissions.length} entregas
                                             </p>
                                         </div>
                                         <div className="text-right">
-                                            <div className="text-sm font-medium text-gray-900">
+                                            <div className="text-sm font-medium text-black-900">
                                                 {courseAverage !== '-' ? `${courseAverage}/5.0` : 'Sin calificar'}
                                             </div>
-                                            <div className="text-xs text-gray-500">
+                                            <div className="text-xs text-black-500">
                                                 Promedio
                                             </div>
                                         </div>
@@ -224,7 +224,7 @@ export default function AnalyticsPage() {
 
                 {/* Estadísticas de Progreso */}
                 <div className="mt-6 bg-white shadow rounded-lg p-6">
-                    <h2 className="text-lg font-medium text-gray-900 mb-4">
+                    <h2 className="text-lg font-medium text-black-900 mb-4">
                         Estado de Entregas
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { LayoutProps } from '../../../../.next/types/app/auth/login/page';
 
 interface User {
   id: string;
@@ -12,18 +11,16 @@ interface User {
 interface AuthState {
   user: User | null;
   token: string | null;
-  isLoading: boolean;
-  loading: boolean;
   isAuthenticated: boolean;
+  loading: boolean;
   error: string | null;
 }
 
 const initialState: AuthState = {
   user: null,
   token: null,
-  isLoading: false,
-  loading: false,
   isAuthenticated: false,
+  loading: false,
   error: null,
 };
 
@@ -35,20 +32,35 @@ const authSlice = createSlice({
       state.user = action.payload.user;
       state.token = action.payload.token;
       state.isAuthenticated = true;
+      state.loading = false;
       state.error = null;
+      
+      // Guardar token en localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('token', action.payload.token);
+      }
     },
     clearCredentials: (state) => {
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
+      state.loading = false;
       state.error = null;
+      
+      // Remover token de localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('token');
+      }
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
-      state.isLoading = action.payload;
+      state.loading = action.payload;
+      if (action.payload) {
+        state.error = null;
+      }
     },
     setError: (state, action: PayloadAction<string>) => {
       state.error = action.payload;
-      state.isLoading = false;
+      state.loading = false;
     },
   },
 });

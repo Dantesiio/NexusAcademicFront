@@ -18,15 +18,15 @@ export const CourseModal = ({ course, onClose }: Props) => {
     };
 
     return (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div className="fixed inset-0 bg-black-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
             <div className="relative top-20 mx-auto p-5 border max-w-2xl shadow-lg rounded-md bg-white">
                 <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-xl font-bold text-gray-900">
+                    <h3 className="text-xl font-bold text-black-900">
                         Detalles del Curso
                     </h3>
                     <button
                         onClick={onClose}
-                        className="text-gray-400 hover:text-gray-600"
+                        className="text-black-400 hover:text-black-600"
                     >
                         <IoCloseOutline className="h-6 w-6" />
                     </button>
@@ -45,7 +45,7 @@ export const CourseModal = ({ course, onClose }: Props) => {
                             <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                                 course.status === 'ACTIVE' 
                                     ? 'bg-green-500 text-white' 
-                                    : 'bg-gray-500 text-white'
+                                    : 'bg-black-500 text-white'
                             }`}>
                                 {course.status}
                             </span>
@@ -53,29 +53,29 @@ export const CourseModal = ({ course, onClose }: Props) => {
                     </div>
 
                     <div>
-                        <h5 className="text-lg font-semibold text-gray-900 mb-3">Descripción</h5>
-                        <p className="text-gray-700 leading-relaxed">{course.description}</p>
+                        <h5 className="text-lg font-semibold text-black-900 mb-3">Descripción</h5>
+                        <p className="text-black-700 leading-relaxed">{course.description}</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="bg-black-50 p-4 rounded-lg">
                             <div className="flex items-center mb-2">
-                                <IoPersonOutline className="h-5 w-5 text-gray-600 mr-2" />
-                                <h6 className="font-semibold text-gray-900">Profesor</h6>
+                                <IoPersonOutline className="h-5 w-5 text-black-600 mr-2" />
+                                <h6 className="font-semibold text-black-900">Profesor</h6>
                             </div>
-                            <p className="text-gray-700">{course.teacher.fullName}</p>
-                            <p className="text-sm text-gray-500">{course.teacher.email}</p>
+                            <p className="text-black-700">{course.teacher.fullName}</p>
+                            <p className="text-sm text-black-500">{course.teacher.email}</p>
                         </div>
 
-                        <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="bg-black-50 p-4 rounded-lg">
                             <div className="flex items-center mb-2">
-                                <IoCalendarOutline className="h-5 w-5 text-gray-600 mr-2" />
-                                <h6 className="font-semibold text-gray-900">Duración</h6>
+                                <IoCalendarOutline className="h-5 w-5 text-black-600 mr-2" />
+                                <h6 className="font-semibold text-black-900">Duración</h6>
                             </div>
-                            <p className="text-sm text-gray-700">
+                            <p className="text-sm text-black-700">
                                 <span className="font-medium">Inicio:</span> {formatDate(course.startDate)}
                             </p>
-                            <p className="text-sm text-gray-700">
+                            <p className="text-sm text-black-700">
                                 <span className="font-medium">Fin:</span> {formatDate(course.endDate)}
                             </p>
                         </div>
@@ -99,7 +99,7 @@ export const CourseModal = ({ course, onClose }: Props) => {
                 <div className="mt-6 flex justify-end">
                     <button
                         onClick={onClose}
-                        className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+                        className="px-4 py-2 bg-black-600 text-white rounded-md hover:bg-black-700 transition-colors"
                     >
                         Cerrar
                     </button>

@@ -1,29 +1,76 @@
 'use client'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../../store';
-import { registerUser } from '../../store/actions/authActions';
 import { IoEyeOutline, IoEyeOffOutline } from 'react-icons/io5';
+
+// Mock register function
+const mockRegister = async (email: string, password: string, fullName: string) => {
+    // Simular delay de API
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    if (email && password && fullName) {
+        const token = 'mock_token_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('token', token);
+        return { success: true };
+    } else {
+        throw new Error('Todos los campos son requeridos');
+    }
+};
 
 export default function RegisterPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [fullName, setFullName] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [isClient, setIsClient] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
     
-    const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
-    const { loading, error, isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
+
+    useEffect(() => {
+        if (isClient) {
+            // Verificar si ya hay token
+            const token = localStorage.getItem('token');
+            if (token) {
+                router.push('/dashboard/main');
+            }
+        }
+    }, [isClient, router]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        await dispatch(registerUser({ email, password, fullName }));
+        if (!isClient) return;
         
-        if (isAuthenticated) {
+        try {
+            setIsLoading(true);
+            setErrorMessage('');
+            
+            await mockRegister(email, password, fullName);
+            
+            // Redirigir al dashboard
             router.push('/dashboard/main');
+            
+        } catch (error) {
+            console.error('Register error:', error);
+            setErrorMessage(error instanceof Error ? error.message : 'Error al registrar usuario');
+        } finally {
+            setIsLoading(false);
         }
     };
+
+    // Loading state durante hidratación
+    if (!isClient) {
+        return (
+            <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -104,19 +151,19 @@ export default function RegisterPage() {
                             </div>
                         </div>
 
-                        {error && (
+                        {errorMessage && (
                             <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded relative">
-                                {error}
+                                {errorMessage}
                             </div>
                         )}
 
                         <div>
                             <button
                                 type="submit"
-                                disabled={loading}
+                                disabled={isLoading}
                                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                {loading ? 'Registrando...' : 'Registrarse'}
+                                {isLoading ? 'Registrando...' : 'Registrarse'}
                             </button>
                         </div>
                     </form>

@@ -15,8 +15,9 @@ export function Providers({ children }: ProvidersProps) {
     setIsClient(true);
   }, []);
 
+  // Durante SSR, renderizar sin Redux pero sin errores
   if (!isClient) {
-    return <div>{children}</div>;
+    return <div style={{ display: 'none' }}>{children}</div>;
   }
 
   return (

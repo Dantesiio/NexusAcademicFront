@@ -7,6 +7,7 @@ export const api = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
+    timeout: 10000, // 10 second timeout
 });
 
 // Request interceptor to add auth token
@@ -29,13 +30,33 @@ api.interceptors.request.use(
 api.interceptors.response.use(
     (response) => response,
     (error) => {
+        // Handle network errors
+        if (!error.response) {
+            console.error('Network error:', error.message);
+            return Promise.reject({
+                message: 'Error de conexión. Por favor verifica tu conexión a internet.',
+                status: 0
+            });
+        }
+
+        // Handle 401 errors (unauthorized)
         if (error.response?.status === 401) {
-            // Token expired or invalid
             if (typeof window !== 'undefined') {
                 localStorage.removeItem('token');
                 window.location.href = '/auth/login';
             }
         }
-        return Promise.reject(error);
+
+        // Handle other HTTP errors
+        const errorMessage = error.response?.data?.message || 
+                           error.response?.data?.error || 
+                           `Error ${error.response?.status}: ${error.response?.statusText}` ||
+                           'Error desconocido';
+
+        return Promise.reject({
+            message: errorMessage,
+            status: error.response?.status,
+            data: error.response?.data
+        });
     }
 );

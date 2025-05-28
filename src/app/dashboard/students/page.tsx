@@ -7,7 +7,11 @@ import { Student } from '../../store/slices/studentSlice';
 import { StudentTable } from '../../components/StudentTable';
 import { StudentForm } from '../../components/StudentForm';
 import { ProtectedRoute } from '../../components/ProtectedRoute';
+import { ClientOnlyWrapper } from '../../components/ClientOnlyWrapper';
 import { IoAddOutline, IoSearchOutline } from 'react-icons/io5';
+
+// Forzar renderizado dinámico
+export const dynamic = 'force-dynamic';
 
 export default function StudentsPage() {
     const dispatch = useDispatch<AppDispatch>();
@@ -55,57 +59,59 @@ export default function StudentsPage() {
     }
 
     return (
-        <ProtectedRoute requiredRoles={['admin', 'teacher']}>
-            <div className="p-6">
-                <div className="mb-6">
-                    <div className="flex justify-between items-center">
-                        <div>
-                            <h1 className="text-2xl font-bold text-gray-900">Gestión de Estudiantes</h1>
-                            <p className="text-gray-600">Administra los estudiantes del sistema</p>
+        <ClientOnlyWrapper>
+            <ProtectedRoute requiredRoles={['admin', 'teacher']}>
+                <div className="p-6">
+                    <div className="mb-6">
+                        <div className="flex justify-between items-center">
+                            <div>
+                                <h1 className="text-2xl font-bold text-black-900">Gestión de Estudiantes</h1>
+                                <p className="text-black-600">Administra los estudiantes del sistema</p>
+                            </div>
+                            <button
+                                onClick={() => setShowForm(true)}
+                                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
+                            >
+                                <IoAddOutline className="h-5 w-5 mr-2" />
+                                Nuevo Estudiante
+                            </button>
                         </div>
-                        <button
-                            onClick={() => setShowForm(true)}
-                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
-                        >
-                            <IoAddOutline className="h-5 w-5 mr-2" />
-                            Nuevo Estudiante
-                        </button>
                     </div>
-                </div>
 
-                <div className="mb-6">
-                    <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <IoSearchOutline className="h-5 w-5 text-gray-400" />
+                    <div className="mb-6">
+                        <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <IoSearchOutline className="h-5 w-5 text-black-400" />
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Buscar estudiantes..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="block w-full pl-10 pr-3 py-2 border border-black-300 rounded-md leading-5 bg-white placeholder-black-500 focus:outline-none focus:placeholder-black-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            />
                         </div>
-                        <input
-                            type="text"
-                            placeholder="Buscar estudiantes..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        />
                     </div>
-                </div>
 
-                {error && (
-                    <div className="mb-4 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded relative">
-                        {error}
-                    </div>
-                )}
+                    {error && (
+                        <div className="mb-4 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded relative">
+                            {error}
+                        </div>
+                    )}
 
-                <StudentTable 
-                    students={filteredStudents} 
-                    onEdit={handleEdit}
-                />
-
-                {showForm && (
-                    <StudentForm
-                        student={editingStudent}
-                        onClose={handleCloseForm}
+                    <StudentTable 
+                        students={filteredStudents} 
+                        onEdit={handleEdit}
                     />
-                )}
-            </div>
-        </ProtectedRoute>
+
+                    {showForm && (
+                        <StudentForm
+                            student={editingStudent}
+                            onClose={handleCloseForm}
+                        />
+                    )}
+                </div>
+            </ProtectedRoute>
+        </ClientOnlyWrapper>
     );
 }

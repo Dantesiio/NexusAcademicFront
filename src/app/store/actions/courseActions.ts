@@ -15,8 +15,9 @@ export const getCourses = () => async (dispatch: Dispatch) => {
     try {
         const courses = await courseService.getCourses();
         dispatch(setCoursesData(courses));
-    } catch (error: any) {
-        dispatch(fetchingCoursesFailure(error.response?.data?.message || 'Error al obtener cursos'));
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Error al obtener cursos';
+        dispatch(fetchingCoursesFailure(errorMessage));
     }
 };
 
@@ -25,8 +26,9 @@ export const getCourse = (id: string) => async (dispatch: Dispatch) => {
     try {
         const course = await courseService.getCourse(id);
         dispatch(setCurrentCourse(course));
-    } catch (error: any) {
-        dispatch(fetchingCoursesFailure(error.response?.data?.message || 'Error al obtener curso'));
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Error al obtener curso';
+        dispatch(fetchingCoursesFailure(errorMessage));
     }
 };
 
@@ -35,8 +37,9 @@ export const createCourse = (data: CreateCourseData) => async (dispatch: Dispatc
     try {
         const newCourse = await courseService.createCourse(data);
         dispatch(addCourse(newCourse));
-    } catch (error: any) {
-        dispatch(fetchingCoursesFailure(error.response?.data?.message || 'Error al crear curso'));
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Error al crear curso';
+        dispatch(fetchingCoursesFailure(errorMessage));
     }
 };
 
@@ -45,8 +48,9 @@ export const updateCourseAction = (id: string, data: UpdateCourseData) => async 
     try {
         const updatedCourse = await courseService.updateCourse(id, data);
         dispatch(updateCourse(updatedCourse));
-    } catch (error: any) {
-        dispatch(fetchingCoursesFailure(error.response?.data?.message || 'Error al actualizar curso'));
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Error al actualizar curso';
+        dispatch(fetchingCoursesFailure(errorMessage));
     }
 };
 
@@ -55,7 +59,8 @@ export const deleteCourse = (id: string) => async (dispatch: Dispatch) => {
     try {
         await courseService.deleteCourse(id);
         dispatch(removeCourse(id));
-    } catch (error: any) {
-        dispatch(fetchingCoursesFailure(error.response?.data?.message || 'Error al eliminar curso'));
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Error al eliminar curso';
+        dispatch(fetchingCoursesFailure(errorMessage));
     }
 };
