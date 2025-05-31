@@ -1,3 +1,4 @@
+// src/app/components/Sidebar.tsx
 'use client'
 import Image from 'next/image';
 import { useSelector, useDispatch } from 'react-redux';
@@ -21,53 +22,79 @@ export const Sidebar = () => {
         dispatch(logoutUser());
     };
 
+    // Obtener roles de forma segura
+    const userRoles = user?.roles || [];
+    
+    // Log para debug
+    console.log('User in sidebar:', user);
+    console.log('User roles:', userRoles);
+
     const menuItems = [
         {
             path: '/dashboard/main',
             icon: <IoBrowsersOutline />,
             title: 'Dashboard',
             subTitle: 'Página Principal',
-            roles: ['admin', 'teacher', 'student']
+            roles: ['admin', 'teacher', 'student', 'superUser']
         },
         {
             path: '/dashboard/students',
             icon: <IoPersonOutline />,
             title: 'Estudiantes',
             subTitle: 'Gestión de Estudiantes',
-            roles: ['admin', 'teacher']
+            roles: ['admin', 'teacher', 'superUser']
         },
         {
             path: '/dashboard/courses',
             icon: <IoBookOutline />,
             title: 'Cursos',
             subTitle: 'Gestión de Cursos',
-            roles: ['admin', 'teacher']
+            roles: ['admin', 'teacher', 'superUser']
         },
         {
             path: '/dashboard/submissions',
             icon: <IoDocumentTextOutline />,
             title: 'Entregas',
             subTitle: 'Gestión de Entregas',
-            roles: ['admin', 'teacher']
+            roles: ['admin', 'teacher', 'superUser']
         },
         {
             path: '/dashboard/analytics',
             icon: <IoStatsChartOutline />,
             title: 'Analytics',
             subTitle: 'Estadísticas',
-            roles: ['admin', 'teacher']
+            roles: ['admin', 'teacher', 'superUser']
         }
     ];
 
-    const filteredMenuItems = menuItems.filter(item => 
-        item.roles.some(role => user?.roles.includes(role))
-    );
+    // Filtrar items de menú de forma segura
+    const filteredMenuItems = menuItems.filter(item => {
+        // Si no hay usuario o no tiene roles, mostrar solo dashboard
+        if (!user || !userRoles || userRoles.length === 0) {
+            return item.path === '/dashboard/main';
+        }
+        
+        // Verificar si el usuario tiene al menos uno de los roles requeridos
+        return item.roles.some(role => userRoles.includes(role));
+    });
+
+    // Mostrar loading si no hay usuario
+    if (!user) {
+        return (
+            <div
+                style={{ width: '400px' }}
+                className="bg-gray-900 min-h-screen z-10 text-slate-300 w-64 left-0 h-screen flex items-center justify-center"
+            >
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            </div>
+        );
+    }
 
     return (
         <div
             style={{ width: '400px' }}
             id="menu" 
-            className="bg-black-900 min-h-screen z-10 text-slate-300 w-64 left-0 h-screen overflow-y-scroll"
+            className="bg-gray-900 min-h-screen z-10 text-slate-300 w-64 left-0 h-screen overflow-y-scroll"
         >
             <div id="logo" className="my-4 px-6">
                 <h1 className="text-lg md:text-2xl font-bold text-white">
@@ -90,10 +117,10 @@ export const Sidebar = () => {
                     </span>
                     <div className="flex flex-col">
                         <span className="text-sm md:text-base font-bold text-white">
-                            {user?.fullName || 'Usuario'}
+                            {user.fullName || 'Usuario'}
                         </span>
                         <span className="text-xs text-slate-400">
-                            {user?.roles.join(', ')}
+                            {userRoles.length > 0 ? userRoles.join(', ') : 'Sin roles'}
                         </span>
                     </div>
                 </div>
@@ -101,8 +128,23 @@ export const Sidebar = () => {
 
             <div id="nav" className="w-full px-6">
                 {filteredMenuItems.map(item => (
-                    <SidebarItemMenu key={item.path} href={item.path} icon={item.icon} title={item.title} />
+                    <SidebarItemMenu 
+                        key={item.path} 
+                        href={item.path} 
+                        icon={item.icon} 
+                        title={item.title} 
+                    />
                 ))}
+                
+                {/* Mostrar mensaje si no hay items filtrados */}
+                {filteredMenuItems.length === 0 && (
+                    <div className="text-center py-4">
+                        <p className="text-slate-500 text-sm">No hay opciones disponibles</p>
+                        <p className="text-slate-600 text-xs mt-1">
+                            Roles actuales: {userRoles.length > 0 ? userRoles.join(', ') : 'Ninguno'}
+                        </p>
+                    </div>
+                )}
             </div>
 
             <div className="absolute bottom-0 w-full px-6 py-4">

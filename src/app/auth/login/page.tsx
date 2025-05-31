@@ -1,72 +1,66 @@
+// src/app/auth/login/page.tsx
 'use client'
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useDispatch, useSelector } from 'react-redux';
 import { IoEyeOutline, IoEyeOffOutline } from 'react-icons/io5';
-
-// Mock login function - reemplaza Redux temporalmente
-const mockLogin = async (email: string, password: string) => {
-    // Simular delay de API
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    if (email === 'admin@nexusacademic.com' && password === 'admin123') {
-        const token = 'mock_token_' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem('token', token);
-        return { success: true };
-    } else {
-        throw new Error('Credenciales inválidas');
-    }
-};
+import { AppDispatch, RootState } from '../../store';
+import { loginUser, initializeAuthStatus } from '../../store/actions/authActions';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [isClient, setIsClient] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState('');
     
+    const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
+    const { loading, error, isAuthenticated, isInitialized } = useSelector((state: RootState) => state.auth);
 
     useEffect(() => {
         setIsClient(true);
-    }, []);
+        if (!isInitialized) {
+            dispatch(initializeAuthStatus());
+        }
+    }, [dispatch, isInitialized]);
 
     useEffect(() => {
-        if (isClient) {
-            // Verificar si ya hay token
-            const token = localStorage.getItem('token');
-            if (token) {
-                router.push('/dashboard/main');
-            }
+        if (isInitialized && isAuthenticated) {
+            router.push('/dashboard/main');
         }
-    }, [isClient, router]);
+    }, [isInitialized, isAuthenticated, router]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!isClient) return;
         
         try {
-            setIsLoading(true);
-            setErrorMessage('');
-            
-            await mockLogin(email, password);
-            
-            // Redirigir al dashboard
+            await dispatch(loginUser({ email, password }));
+            // Si llegamos aquí, el login fue exitoso
             router.push('/dashboard/main');
-            
         } catch (error) {
-            console.error('Login error:', error);
-            setErrorMessage(error instanceof Error ? error.message : 'Error al iniciar sesión');
-        } finally {
-            setIsLoading(false);
+            // El error ya se maneja en el slice
+            console.error('Error en login:', error);
         }
     };
 
     // Loading state durante hidratación
-    if (!isClient) {
+    if (!isClient || !isInitialized) {
         return (
             <div className="min-h-screen bg-gray-100 flex items-center justify-center">
                 <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+            </div>
+        );
+    }
+
+    // Si ya está autenticado, no mostrar el formulario
+    if (isAuthenticated) {
+        return (
+            <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto"></div>
+                    <p className="mt-4 text-gray-600">Redirigiendo...</p>
+                </div>
             </div>
         );
     }
@@ -103,6 +97,7 @@ export default function LoginPage() {
                                     onChange={(e) => setEmail(e.target.value)}
                                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                                     placeholder="admin@nexusacademic.com"
+                                    disabled={loading}
                                 />
                             </div>
                         </div>
@@ -122,12 +117,14 @@ export default function LoginPage() {
                                     onChange={(e) => setPassword(e.target.value)}
                                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm pr-10"
                                     placeholder="admin123"
+                                    disabled={loading}
                                 />
                                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                                     <button
                                         type="button"
                                         className="text-gray-400 hover:text-gray-500"
                                         onClick={() => setShowPassword(!showPassword)}
+                                        disabled={loading}
                                     >
                                         {showPassword ? <IoEyeOffOutline className="h-5 w-5" /> : <IoEyeOutline className="h-5 w-5" />}
                                     </button>
@@ -135,19 +132,27 @@ export default function LoginPage() {
                             </div>
                         </div>
 
-                        {errorMessage && (
+                        {error && (
                             <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded relative">
-                                {errorMessage}
+                                <strong className="font-bold">Error: </strong>
+                                <span className="block sm:inline">{error}</span>
                             </div>
                         )}
 
                         <div>
                             <button
                                 type="submit"
-                                disabled={isLoading}
+                                disabled={loading}
                                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+                                {loading ? (
+                                    <>
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                        Iniciando sesión...
+                                    </>
+                                ) : (
+                                    'Iniciar Sesión'
+                                )}
                             </button>
                         </div>
                     </form>

@@ -1,3 +1,4 @@
+// src/app/dashboard/submissions/page.tsx
 'use client'
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -52,7 +53,10 @@ export default function SubmissionsPage() {
     }, [submissions, searchTerm, statusFilter]);
 
     const handleGradeSubmit = async (submissionId: string) => {
-        if (!gradeData.grade) return;
+        if (!gradeData.grade) {
+            alert('Por favor ingresa una calificación');
+            return;
+        }
         
         try {
             await dispatch(gradeSubmission(submissionId, {
@@ -83,29 +87,29 @@ export default function SubmissionsPage() {
         <ProtectedRoute requiredRoles={['admin', 'teacher']}>
             <div className="p-6">
                 <div className="mb-6">
-                    <h1 className="text-2xl font-bold text-black-900">Gestión de Entregas</h1>
-                    <p className="text-black-600">Revisa y califica las entregas de los estudiantes</p>
+                    <h1 className="text-2xl font-bold text-gray-900">Gestión de Entregas</h1>
+                    <p className="text-gray-600">Revisa y califica las entregas de los estudiantes</p>
                 </div>
 
                 <div className="mb-6 flex flex-col sm:flex-row gap-4">
                     <div className="flex-1">
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <IoSearchOutline className="h-5 w-5 text-black-400" />
+                                <IoSearchOutline className="h-5 w-5 text-gray-400" />
                             </div>
                             <input
                                 type="text"
                                 placeholder="Buscar entregas..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="block w-full pl-10 pr-3 py-2 border border-black-300 rounded-md leading-5 bg-white placeholder-black-500 focus:outline-none focus:placeholder-black-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                             />
                         </div>
                     </div>
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value as 'ALL' | 'GRADED' | 'PENDING')}
-                        className="border border-black-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                        className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                     >
                         <option value="ALL">Todas las entregas</option>
                         <option value="PENDING">Pendientes</option>
@@ -115,7 +119,8 @@ export default function SubmissionsPage() {
 
                 {error && (
                     <div className="mb-4 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded relative">
-                        {error}
+                        <strong className="font-bold">Error: </strong>
+                        <span>{error}</span>
                     </div>
                 )}
 
@@ -127,10 +132,10 @@ export default function SubmissionsPage() {
                                     <div className="flex items-center">
                                         <IoDocumentTextOutline className="h-8 w-8 text-blue-500 mr-3" />
                                         <div>
-                                            <h3 className="text-lg font-medium text-black-900">
+                                            <h3 className="text-lg font-medium text-gray-900">
                                                 {submission.student.name}
                                             </h3>
-                                            <p className="text-sm text-black-500">
+                                            <p className="text-sm text-gray-500">
                                                 {submission.course.name}
                                             </p>
                                         </div>
@@ -149,14 +154,14 @@ export default function SubmissionsPage() {
                                 </div>
 
                                 <div className="mb-4">
-                                    <p className="text-sm text-black-600 mb-2">
+                                    <p className="text-sm text-gray-600 mb-2">
                                         <span className="font-medium">Curso:</span> {submission.course.code}
                                     </p>
-                                    <p className="text-sm text-black-600 mb-2">
+                                    <p className="text-sm text-gray-600 mb-2">
                                         <span className="font-medium">Entregado:</span> {formatDate(submission.submittedAt)}
                                     </p>
                                     {submission.comments && (
-                                        <p className="text-sm text-black-600">
+                                        <p className="text-sm text-gray-600">
                                             <span className="font-medium">Comentarios:</span> {submission.comments}
                                         </p>
                                     )}
@@ -167,7 +172,7 @@ export default function SubmissionsPage() {
                                         href={submission.fileUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="inline-flex items-center justify-center px-3 py-2 border border-black-300 shadow-sm text-sm font-medium rounded-md text-black-700 bg-white hover:bg-black-50"
+                                        className="inline-flex items-center justify-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                                     >
                                         Ver Archivo
                                     </a>
@@ -189,9 +194,9 @@ export default function SubmissionsPage() {
 
                 {filteredSubmissions.length === 0 && (
                     <div className="text-center py-12">
-                        <IoDocumentTextOutline className="mx-auto h-12 w-12 text-black-400" />
-                        <h3 className="mt-2 text-sm font-medium text-black-900">No hay entregas</h3>
-                        <p className="mt-1 text-sm text-black-500">
+                        <IoDocumentTextOutline className="mx-auto h-12 w-12 text-gray-400" />
+                        <h3 className="mt-2 text-sm font-medium text-gray-900">No hay entregas</h3>
+                        <p className="mt-1 text-sm text-gray-500">
                             {submissions.length === 0 
                                 ? 'No se han registrado entregas aún.' 
                                 : 'No se encontraron entregas con los filtros aplicados.'
@@ -202,14 +207,14 @@ export default function SubmissionsPage() {
 
                 {/* Modal de Calificación */}
                 {gradingSubmission && (
-                    <div className="fixed inset-0 bg-black-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+                    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
                         <div className="relative top-20 mx-auto p-5 border max-w-md shadow-lg rounded-md bg-white">
-                            <h3 className="text-lg font-bold text-black-900 mb-4">
+                            <h3 className="text-lg font-bold text-gray-900 mb-4">
                                 Calificar Entrega
                             </h3>
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-black-700">
+                                    <label className="block text-sm font-medium text-gray-700">
                                         Calificación (0-5)
                                     </label>
                                     <input
@@ -219,18 +224,18 @@ export default function SubmissionsPage() {
                                         step="0.1"
                                         value={gradeData.grade}
                                         onChange={(e) => setGradeData(prev => ({...prev, grade: e.target.value}))}
-                                        className="mt-1 block w-full px-3 py-2 border border-black-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-black-700">
+                                    <label className="block text-sm font-medium text-gray-700">
                                         Comentarios
                                     </label>
                                     <textarea
                                         value={gradeData.comments}
                                         onChange={(e) => setGradeData(prev => ({...prev, comments: e.target.value}))}
                                         rows={3}
-                                        className="mt-1 block w-full px-3 py-2 border border-black-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                                         placeholder="Retroalimentación para el estudiante..."
                                     />
                                 </div>
@@ -241,7 +246,7 @@ export default function SubmissionsPage() {
                                         setGradingSubmission(null);
                                         setGradeData({ grade: '', comments: '' });
                                     }}
-                                    className="px-4 py-2 border border-black-300 rounded-md shadow-sm text-sm font-medium text-black-700 bg-white hover:bg-black-50"
+                                    className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
                                 >
                                     Cancelar
                                 </button>

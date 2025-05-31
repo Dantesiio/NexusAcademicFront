@@ -1,4 +1,6 @@
+// src/app/services/studentService.ts
 import { api } from './api';
+import { mockService } from './mockService';
 import { Student } from '../store/slices/studentSlice';
 
 export interface CreateStudentData {
@@ -34,26 +36,54 @@ export interface StudentListParams {
 
 export const studentService = {
     getStudents: async (params?: StudentListParams): Promise<Student[]> => {
-        const response = await api.get('/students', { params });
-        return response.data;
+        try {
+            const response = await api.get('/students', { params });
+            return response.data;
+        } catch (error: any) {
+            console.warn('API no disponible, usando datos mock:', error.message);
+            return await mockService.getStudents();
+        }
     },
 
     getStudent: async (id: string): Promise<Student> => {
-        const response = await api.get(`/students/${id}`);
-        return response.data;
+        try {
+            const response = await api.get(`/students/${id}`);
+            return response.data;
+        } catch (error: any) {
+            console.warn('API no disponible, usando datos mock:', error.message);
+            const students = await mockService.getStudents();
+            const student = students.find(s => s.id === id);
+            if (!student) throw new Error('Estudiante no encontrado');
+            return student;
+        }
     },
 
     createStudent: async (data: CreateStudentData): Promise<Student> => {
-        const response = await api.post('/students', data);
-        return response.data;
+        try {
+            const response = await api.post('/students', data);
+            return response.data;
+        } catch (error: any) {
+            console.warn('API no disponible, usando datos mock:', error.message);
+            return await mockService.createStudent(data);
+        }
     },
 
     updateStudent: async (id: string, data: UpdateStudentData): Promise<Student> => {
-        const response = await api.patch(`/students/${id}`, data);
-        return response.data;
+        try {
+            const response = await api.patch(`/students/${id}`, data);
+            return response.data;
+        } catch (error: any) {
+            console.warn('API no disponible, usando datos mock:', error.message);
+            return await mockService.updateStudent(id, data);
+        }
     },
 
     deleteStudent: async (id: string): Promise<void> => {
-        await api.delete(`/students/${id}`);
+        try {
+            await api.delete(`/students/${id}`);
+        } catch (error: any) {
+            console.warn('API no disponible, usando datos mock:', error.message);
+            return await mockService.deleteStudent(id);
+        }
     }
 };

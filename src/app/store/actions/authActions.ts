@@ -1,10 +1,12 @@
+// src/app/store/actions/authActions.ts
 import { Dispatch } from 'redux';
 import { authService, LoginData, RegisterData } from '../../services/authService';
 import {
   setCredentials,
   clearCredentials,
   setLoading,
-  setError
+  setError,
+  initializeAuth
 } from '../slices/authSlice';
 
 export const loginUser = (data: LoginData) => async (dispatch: Dispatch) => {
@@ -21,9 +23,10 @@ export const loginUser = (data: LoginData) => async (dispatch: Dispatch) => {
             },
             token: response.token
         }));
-    } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : 'Error al iniciar sesión';
+    } catch (error: any) {
+        const errorMessage = error?.message || 'Error al iniciar sesión';
         dispatch(setError(errorMessage));
+        throw error; // Re-throw para manejar en el componente
     }
 };
 
@@ -41,14 +44,21 @@ export const registerUser = (data: RegisterData) => async (dispatch: Dispatch) =
             },
             token: response.token
         }));
-    } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : 'Error al registrar usuario';
+    } catch (error: any) {
+        const errorMessage = error?.message || 'Error al registrar usuario';
         dispatch(setError(errorMessage));
+        throw error; // Re-throw para manejar en el componente
     }
 };
 
 export const checkAuthStatus = () => async (dispatch: Dispatch) => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    // Solo ejecutar en el cliente
+    if (typeof window === 'undefined') {
+        dispatch(initializeAuth());
+        return;
+    }
+
+    const token = localStorage.getItem('token');
     
     if (!token) {
         dispatch(clearCredentials());
@@ -68,7 +78,8 @@ export const checkAuthStatus = () => async (dispatch: Dispatch) => {
             },
             token: response.token
         }));
-    } catch {
+    } catch (error: any) {
+        console.error('Error verificando estado de autenticación:', error);
         dispatch(clearCredentials());
     }
 };
@@ -76,9 +87,25 @@ export const checkAuthStatus = () => async (dispatch: Dispatch) => {
 export const logoutUser = () => async (dispatch: Dispatch) => {
     try {
         await authService.logout();
-    } catch {
+    } catch (error) {
+        console.error('Error en logout:', error);
         // Even if logout fails on server, clear local state
     } finally {
         dispatch(clearCredentials());
+        // Redirigir al login
+        if (typeof window !== 'undefined') {
+            window.location.href = '/auth/login';
+        }
+    }
+};
+
+// Acción para inicializar la autenticación en el cliente
+export const initializeAuthStatus = () => async (dispatch: Dispatch) => {
+    if (typeof window !== 'undefined') {
+        dispatch(initializeAuth());
+        // Verificar el token actual
+        await dispatch(checkAuthStatus() as any);
+    } else {
+        dispatch(initializeAuth());
     }
 };

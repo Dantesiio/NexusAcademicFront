@@ -1,9 +1,10 @@
+// src/app/components/ProtectedRoute.tsx
 'use client'
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { RootState, AppDispatch } from '../store';
-import { checkAuthStatus } from '../store/actions/authActions';
+import { initializeAuthStatus } from '../store/actions/authActions';
 
 interface ProtectedRouteProps {
     children: React.ReactNode;
@@ -13,19 +14,19 @@ interface ProtectedRouteProps {
 export const ProtectedRoute = ({ children, requiredRoles = [] }: ProtectedRouteProps) => {
     const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
-    const { isAuthenticated, user, loading } = useSelector((state: RootState) => state.auth);
+    const { isAuthenticated, user, loading, isInitialized } = useSelector((state: RootState) => state.auth);
 
     useEffect(() => {
-        if (!isAuthenticated && !loading) {
-            dispatch(checkAuthStatus());
+        if (!isInitialized) {
+            dispatch(initializeAuthStatus());
         }
-    }, [dispatch, isAuthenticated, loading]);
+    }, [dispatch, isInitialized]);
 
     useEffect(() => {
-        if (!loading && !isAuthenticated) {
+        if (isInitialized && !loading && !isAuthenticated) {
             router.push('/auth/login');
         }
-    }, [loading, isAuthenticated, router]);
+    }, [isInitialized, loading, isAuthenticated, router]);
 
     useEffect(() => {
         if (isAuthenticated && user && requiredRoles.length > 0) {
@@ -36,26 +37,38 @@ export const ProtectedRoute = ({ children, requiredRoles = [] }: ProtectedRouteP
         }
     }, [isAuthenticated, user, requiredRoles, router]);
 
-    if (loading) {
+    // Mostrar loading mientras se inicializa o se está cargando
+    if (!isInitialized || loading) {
         return (
-            <div className="min-h-screen bg-black-100 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+            <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto"></div>
+                    <p className="mt-4 text-gray-600">Verificando autenticación...</p>
+                </div>
             </div>
         );
     }
 
+    // Si no está autenticado, no mostrar nada (se está redirigiendo)
     if (!isAuthenticated) {
         return null;
     }
 
+    // Verificar roles si se requieren
     if (requiredRoles.length > 0 && user) {
         const hasRequiredRole = requiredRoles.some(role => user.roles.includes(role));
         if (!hasRequiredRole) {
             return (
-                <div className="min-h-screen bg-black-100 flex items-center justify-center">
+                <div className="min-h-screen bg-gray-100 flex items-center justify-center">
                     <div className="text-center">
-                        <h1 className="text-2xl font-bold text-black-900">Acceso Denegado</h1>
-                        <p className="text-black-600 mt-2">No tienes permisos para acceder a esta página.</p>
+                        <h1 className="text-2xl font-bold text-gray-900">Acceso Denegado</h1>
+                        <p className="text-gray-600 mt-2">No tienes permisos para acceder a esta página.</p>
+                        <button
+                            onClick={() => router.push('/dashboard/main')}
+                            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                        >
+                            Ir al Dashboard
+                        </button>
                     </div>
                 </div>
             );

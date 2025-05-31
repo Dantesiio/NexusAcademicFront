@@ -1,3 +1,4 @@
+// src/app/store/Providers.tsx
 'use client';
 
 import { Provider } from 'react-redux';
@@ -15,9 +16,13 @@ export function Providers({ children }: ProvidersProps) {
     setIsClient(true);
   }, []);
 
-  // Durante SSR, renderizar sin Redux pero sin errores
+  // Durante SSR, renderizar un placeholder
   if (!isClient) {
-    return <div style={{ display: 'none' }}>{children}</div>;
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
 
   return (

@@ -1,8 +1,9 @@
+// src/app/dashboard/layout.tsx
 'use client'
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store';
-import { checkAuthStatus } from '../store/actions/authActions';
+import { initializeAuthStatus } from '../store/actions/authActions';
 import { Sidebar } from "../components/Sidebar";
 import { ProtectedRoute } from '../components/ProtectedRoute';
 import { ClientOnlyWrapper } from '../components/ClientOnlyWrapper';
@@ -13,13 +14,13 @@ export default function DashboardLayout({
     children: React.ReactNode
 }) {
     const dispatch = useDispatch<AppDispatch>();
-    const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+    const { isAuthenticated, isInitialized } = useSelector((state: RootState) => state.auth);
 
     useEffect(() => {
-        if (!isAuthenticated) {
-            dispatch(checkAuthStatus());
+        if (!isInitialized) {
+            dispatch(initializeAuthStatus());
         }
-    }, [dispatch, isAuthenticated]);
+    }, [dispatch, isInitialized]);
 
     return (
         <ClientOnlyWrapper>
