@@ -26,7 +26,7 @@ export default function LoginPage() {
 
     useEffect(() => {
         if (isInitialized && isAuthenticated) {
-            router.push('/dashboard/main');
+            router.replace('/dashboard/main'); // Usar replace en lugar de push
         }
     }, [isInitialized, isAuthenticated, router]);
 

@@ -1,9 +1,13 @@
 // src/app/components/Sidebar.tsx
+
 'use client'
 import Image from 'next/image';
 import { useSelector, useDispatch } from 'react-redux';
+import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import { RootState, AppDispatch } from '../store';
 import { logoutUser } from '../store/actions/authActions';
+import { useLogout } from '../hooks/useLogout'; // Importar el hook
 import { SidebarItemMenu } from './SidebarItemMenu';
 import { 
     IoBrowsersOutline, 
@@ -15,17 +19,60 @@ import {
 } from 'react-icons/io5';
 
 export const Sidebar = () => {
+    const logout = useLogout(); // Usar el hook
     const dispatch = useDispatch<AppDispatch>();
-    const { user } = useSelector((state: RootState) => state.auth);
+    const router = useRouter();
+    const { user, loading } = useSelector((state: RootState) => state.auth);
+    const [isClient, setIsClient] = useState(false);
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
+
+    useEffect(() => {
+        if (isClient) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                // Si no hay token, usar el hook de logout que maneja todo
+                logout();
+            }
+        }
+    }, [isClient, logout]);
 
     const handleLogout = () => {
-        dispatch(logoutUser());
+        logout(); // Simplificar usando el hook
     };
+
+    /*const handleLogout = async () => {
+        console.log('Logout button clicked');
+        
+        try {
+            // Dispatch logout action
+            await dispatch(logoutUser());
+            
+            // Forzar navegación inmediata
+            console.log('Navegando a login...');
+            router.replace('/auth/login');
+            
+            // Como backup, usar window.location si router no funciona
+            setTimeout(() => {
+                if (window.location.pathname !== '/auth/login') {
+                    console.log('Router falló, usando window.location');
+                    window.location.replace('/auth/login');
+                }
+            }, 100);
+            
+        } catch (error) {
+            console.error('Error en logout:', error);
+            // Forzar limpieza manual si todo falla
+            localStorage.removeItem('token');
+            window.location.replace('/auth/login');
+        }
+    };*/
 
     // Obtener roles de forma segura
     const userRoles = user?.roles || [];
     
-    // Log para debug
     console.log('User in sidebar:', user);
     console.log('User roles:', userRoles);
 
@@ -67,18 +114,13 @@ export const Sidebar = () => {
         }
     ];
 
-    // Filtrar items de menú de forma segura
     const filteredMenuItems = menuItems.filter(item => {
-        // Si no hay usuario o no tiene roles, mostrar solo dashboard
         if (!user || !userRoles || userRoles.length === 0) {
             return item.path === '/dashboard/main';
         }
-        
-        // Verificar si el usuario tiene al menos uno de los roles requeridos
         return item.roles.some(role => userRoles.includes(role));
     });
 
-    // Mostrar loading si no hay usuario
     if (!user) {
         return (
             <div
@@ -136,7 +178,6 @@ export const Sidebar = () => {
                     />
                 ))}
                 
-                {/* Mostrar mensaje si no hay items filtrados */}
                 {filteredMenuItems.length === 0 && (
                     <div className="text-center py-4">
                         <p className="text-slate-500 text-sm">No hay opciones disponibles</p>
@@ -150,10 +191,13 @@ export const Sidebar = () => {
             <div className="absolute bottom-0 w-full px-6 py-4">
                 <button
                     onClick={handleLogout}
-                    className="w-full px-2 inline-flex space-x-2 items-center border-t border-slate-700 py-3 hover:bg-red-600/10 transition ease-linear duration-150 text-red-400 hover:text-red-300"
+                    disabled={loading}
+                    className="w-full px-2 inline-flex space-x-2 items-center border-t border-slate-700 py-3 hover:bg-red-600/10 transition ease-linear duration-150 text-red-400 hover:text-red-300 disabled:opacity-50"
                 >
                     <IoLogOutOutline />
-                    <span className="text-sm font-medium">Cerrar Sesión</span>
+                    <span className="text-sm font-medium">
+                        {loading ? 'Cerrando...' : 'Cerrar Sesión'}
+                    </span>
                 </button>
             </div>
         </div>

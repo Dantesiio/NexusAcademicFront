@@ -1,4 +1,3 @@
-// src/app/store/actions/authActions.ts
 import { Dispatch } from 'redux';
 import { authService, LoginData, RegisterData } from '../../services/authService';
 import {
@@ -26,7 +25,7 @@ export const loginUser = (data: LoginData) => async (dispatch: Dispatch) => {
     } catch (error: any) {
         const errorMessage = error?.message || 'Error al iniciar sesión';
         dispatch(setError(errorMessage));
-        throw error; // Re-throw para manejar en el componente
+        throw error;
     }
 };
 
@@ -47,12 +46,11 @@ export const registerUser = (data: RegisterData) => async (dispatch: Dispatch) =
     } catch (error: any) {
         const errorMessage = error?.message || 'Error al registrar usuario';
         dispatch(setError(errorMessage));
-        throw error; // Re-throw para manejar en el componente
+        throw error;
     }
 };
 
 export const checkAuthStatus = () => async (dispatch: Dispatch) => {
-    // Solo ejecutar en el cliente
     if (typeof window === 'undefined') {
         dispatch(initializeAuth());
         return;
@@ -84,26 +82,35 @@ export const checkAuthStatus = () => async (dispatch: Dispatch) => {
     }
 };
 
+// ✅ Mejorar el logout - este es el problema principal
 export const logoutUser = () => async (dispatch: Dispatch) => {
+    console.log('Iniciando logout...');
+    
     try {
-        await authService.logout();
+        // Primero limpiar el estado local inmediatamente
+        dispatch(clearCredentials());
+        
+        // Luego intentar logout en servidor (no blocking)
+        try {
+            await authService.logout();
+            console.log('Logout del servidor exitoso');
+        } catch (error) {
+            console.warn('Error en logout del servidor:', error);
+            // No importa si falla el logout del servidor
+        }
+        
     } catch (error) {
         console.error('Error en logout:', error);
-        // Even if logout fails on server, clear local state
-    } finally {
+        // Forzar limpieza del estado incluso si hay errores
         dispatch(clearCredentials());
-        // Redirigir al login
-        if (typeof window !== 'undefined') {
-            window.location.href = '/auth/login';
-        }
     }
+    
+    console.log('Logout completado, redirigiendo...');
 };
 
-// Acción para inicializar la autenticación en el cliente
 export const initializeAuthStatus = () => async (dispatch: Dispatch) => {
     if (typeof window !== 'undefined') {
         dispatch(initializeAuth());
-        // Verificar el token actual
         await dispatch(checkAuthStatus() as any);
     } else {
         dispatch(initializeAuth());

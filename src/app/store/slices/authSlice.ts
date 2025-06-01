@@ -1,4 +1,5 @@
 // src/app/store/slices/authSlice.ts
+
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface User {
@@ -15,7 +16,7 @@ interface AuthState {
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
-  isInitialized: boolean; // Para manejar la hidratación
+  isInitialized: boolean;
 }
 
 const initialState: AuthState = {
@@ -34,11 +35,10 @@ const authSlice = createSlice({
     setCredentials: (state, action: PayloadAction<{ user: User; token: string }>) => {
       console.log('Setting credentials with:', action.payload);
       
-      // Validar que el usuario tenga roles
       const user = action.payload.user;
       if (!user.roles || !Array.isArray(user.roles)) {
         console.warn('User roles missing or invalid, setting default roles');
-        user.roles = ['teacher']; // Default role
+        user.roles = ['teacher'];
       }
       
       state.user = user;
@@ -50,13 +50,20 @@ const authSlice = createSlice({
       
       console.log('User set in state:', state.user);
       
-      // Guardar token en localStorage solo en el cliente
       if (typeof window !== 'undefined') {
         localStorage.setItem('token', action.payload.token);
       }
     },
     clearCredentials: (state) => {
-      console.log('Clearing credentials');
+      console.log('Clearing credentials from state');
+      
+      // Limpiar localStorage inmediatamente
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('token');
+        console.log('Token removed from localStorage');
+      }
+      
+      // Resetear todo el estado
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
@@ -64,10 +71,7 @@ const authSlice = createSlice({
       state.error = null;
       state.isInitialized = true;
       
-      // Remover token de localStorage solo en el cliente
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('token');
-      }
+      console.log('Auth state cleared');
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
@@ -83,15 +87,12 @@ const authSlice = createSlice({
     setInitialized: (state, action: PayloadAction<boolean>) => {
       state.isInitialized = action.payload;
     },
-    // Para manejar la hidratación inicial
     initializeAuth: (state) => {
       state.isInitialized = true;
       if (typeof window !== 'undefined') {
         const token = localStorage.getItem('token');
         if (token) {
           state.token = token;
-          // Aquí se debe verificar el token con el backend
-          // Esto se maneja en el action creator
         }
       }
     }

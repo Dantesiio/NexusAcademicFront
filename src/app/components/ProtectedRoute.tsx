@@ -1,4 +1,5 @@
 // src/app/components/ProtectedRoute.tsx
+
 'use client'
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
@@ -24,7 +25,8 @@ export const ProtectedRoute = ({ children, requiredRoles = [] }: ProtectedRouteP
 
     useEffect(() => {
         if (isInitialized && !loading && !isAuthenticated) {
-            router.push('/auth/login');
+            console.log('User not authenticated, redirecting to login');
+            router.replace('/auth/login');
         }
     }, [isInitialized, loading, isAuthenticated, router]);
 
@@ -32,12 +34,11 @@ export const ProtectedRoute = ({ children, requiredRoles = [] }: ProtectedRouteP
         if (isAuthenticated && user && requiredRoles.length > 0) {
             const hasRequiredRole = requiredRoles.some(role => user.roles.includes(role));
             if (!hasRequiredRole) {
-                router.push('/dashboard/main');
+                router.replace('/dashboard/main');
             }
         }
     }, [isAuthenticated, user, requiredRoles, router]);
 
-    // Mostrar loading mientras se inicializa o se está cargando
     if (!isInitialized || loading) {
         return (
             <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -49,12 +50,10 @@ export const ProtectedRoute = ({ children, requiredRoles = [] }: ProtectedRouteP
         );
     }
 
-    // Si no está autenticado, no mostrar nada (se está redirigiendo)
     if (!isAuthenticated) {
         return null;
     }
 
-    // Verificar roles si se requieren
     if (requiredRoles.length > 0 && user) {
         const hasRequiredRole = requiredRoles.some(role => user.roles.includes(role));
         if (!hasRequiredRole) {
@@ -64,7 +63,7 @@ export const ProtectedRoute = ({ children, requiredRoles = [] }: ProtectedRouteP
                         <h1 className="text-2xl font-bold text-gray-900">Acceso Denegado</h1>
                         <p className="text-gray-600 mt-2">No tienes permisos para acceder a esta página.</p>
                         <button
-                            onClick={() => router.push('/dashboard/main')}
+                            onClick={() => router.replace('/dashboard/main')}
                             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                         >
                             Ir al Dashboard
