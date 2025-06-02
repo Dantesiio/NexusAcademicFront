@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store';
@@ -37,19 +37,25 @@ export const CourseForm = ({ course, onClose }: Props) => {
                 name: course.name,
                 description: course.description,
                 code: course.code,
-                teacherId: course.teacher.id,
+                teacherId: course.teacher.id, // Asegúrate que course.teacher exista si course existe
                 status: course.status,
                 startDate: course.startDate.split('T')[0],
                 endDate: course.endDate.split('T')[0]
             });
         } else {
             // Set default teacher ID for new courses
-            setFormData(prev => ({
-                ...prev,
-                teacherId: user?.id || ''
-            }));
+            setFormData(prev => {
+                const newTeacherId = user?.id || '';
+                if (prev.teacherId === newTeacherId) {
+                    return prev; // No hay cambio necesario, retorna el estado previo
+                }
+                return {
+                    ...prev,
+                    teacherId: newTeacherId
+                };
+            });
         }
-    }, [course, user]);
+    }, [course, user]); // Las dependencias están correctas
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -61,7 +67,7 @@ export const CourseForm = ({ course, onClose }: Props) => {
 
         const submitData = {
             ...formData,
-            teacherId: formData.teacherId || user?.id || ''
+            teacherId: formData.teacherId || user?.id || '' // Asegura que teacherId tenga un valor
         };
 
         try {
@@ -73,6 +79,7 @@ export const CourseForm = ({ course, onClose }: Props) => {
             onClose();
         } catch (error) {
             console.error('Error submitting form:', error);
+            // Considera mostrar un mensaje de error al usuario aquí
         }
     };
 
@@ -94,6 +101,7 @@ export const CourseForm = ({ course, onClose }: Props) => {
                     <button
                         onClick={onClose}
                         className="text-black-400 hover:text-black-600"
+                        aria-label="Cerrar formulario" // ⭐ Buena práctica para accesibilidad
                     >
                         <IoCloseOutline className="h-6 w-6" />
                     </button>
@@ -102,10 +110,11 @@ export const CourseForm = ({ course, onClose }: Props) => {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-black-700">
+                            <label htmlFor="courseName" className="block text-sm font-medium text-black-700"> {/* ⭐ htmlFor */}
                                 Nombre del Curso
                             </label>
                             <input
+                                id="courseName" // ⭐ id
                                 type="text"
                                 name="name"
                                 value={formData.name}
@@ -116,10 +125,11 @@ export const CourseForm = ({ course, onClose }: Props) => {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-black-700">
+                            <label htmlFor="courseCode" className="block text-sm font-medium text-black-700"> {/* ⭐ htmlFor */}
                                 Código del Curso
                             </label>
                             <input
+                                id="courseCode" // ⭐ id
                                 type="text"
                                 name="code"
                                 value={formData.code}
@@ -132,10 +142,11 @@ export const CourseForm = ({ course, onClose }: Props) => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-black-700">
+                        <label htmlFor="courseDescription" className="block text-sm font-medium text-black-700"> {/* ⭐ htmlFor */}
                             Descripción
                         </label>
                         <textarea
+                            id="courseDescription" // ⭐ id
                             name="description"
                             value={formData.description}
                             onChange={handleInputChange}
@@ -148,10 +159,11 @@ export const CourseForm = ({ course, onClose }: Props) => {
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-black-700">
+                            <label htmlFor="courseStatus" className="block text-sm font-medium text-black-700"> {/* ⭐ htmlFor */}
                                 Estado
                             </label>
                             <select
+                                id="courseStatus" // ⭐ id
                                 name="status"
                                 value={formData.status}
                                 onChange={handleInputChange}
@@ -162,10 +174,11 @@ export const CourseForm = ({ course, onClose }: Props) => {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-black-700">
+                            <label htmlFor="courseTeacher" className="block text-sm font-medium text-black-700"> {/* ⭐ htmlFor */}
                                 Profesor
                             </label>
                             <select
+                                id="courseTeacher" // ⭐ id
                                 name="teacherId"
                                 value={formData.teacherId}
                                 onChange={handleInputChange}
@@ -184,10 +197,11 @@ export const CourseForm = ({ course, onClose }: Props) => {
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-black-700">
+                            <label htmlFor="startDate" className="block text-sm font-medium text-black-700"> {/* ⭐ CORREGIDO: htmlFor */}
                                 Fecha de Inicio
                             </label>
                             <input
+                                id="startDate" // ⭐ CORREGIDO: id
                                 type="date"
                                 name="startDate"
                                 value={formData.startDate}
@@ -197,10 +211,11 @@ export const CourseForm = ({ course, onClose }: Props) => {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-black-700">
+                            <label htmlFor="endDate" className="block text-sm font-medium text-black-700"> {/* ⭐ CORREGIDO: htmlFor */}
                                 Fecha de Fin
                             </label>
                             <input
+                                id="endDate" // ⭐ CORREGIDO: id
                                 type="date"
                                 name="endDate"
                                 value={formData.endDate}

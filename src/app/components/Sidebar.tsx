@@ -127,7 +127,8 @@ export const Sidebar = () => {
                 style={{ width: '400px' }}
                 className="bg-gray-900 min-h-screen z-10 text-slate-300 w-64 left-0 h-screen flex items-center justify-center"
             >
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" role="status"
+  aria-label="Loading" data-testid="spinner"></div>
             </div>
         );
     }
@@ -190,6 +191,7 @@ export const Sidebar = () => {
 
             <div className="absolute bottom-0 w-full px-6 py-4">
                 <button
+                    data-testid="logout-button"
                     onClick={handleLogout}
                     disabled={loading}
                     className="w-full px-2 inline-flex space-x-2 items-center border-t border-slate-700 py-3 hover:bg-red-600/10 transition ease-linear duration-150 text-red-400 hover:text-red-300 disabled:opacity-50"
