@@ -53,6 +53,20 @@ export const StudentForm = ({ student, onClose }: Props) => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        const { name, age, email } = formData;
+        console.log("name:", `"${formData.name}"`);
+        console.log("age:", `"${formData.age}"`);
+        console.log("email:", `"${formData.email}"`);
+        console.log("gender:", `"${formData.gender}"`);
+
+        const missingRequired =
+            !name.trim() || !age.trim() || !email.trim();
+
+        if (missingRequired) {
+            console.warn('Faltan campos requeridos, no se envía.');
+            return;
+        }
         
         const submitData = {
             name: formData.name,
@@ -66,6 +80,8 @@ export const StudentForm = ({ student, onClose }: Props) => {
                 score: e.score ? parseInt(e.score) : undefined
             }))
         };
+
+        console.log('Datos enviados:', submitData);
 
         if (student) {
             await dispatch(updateStudentAction(student.id, submitData));

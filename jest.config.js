@@ -1,15 +1,14 @@
+/** @type {import('jest').Config} */
 module.exports = {
-  testEnvironment: 'jsdom',
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
-  moduleNameMapper: {
-    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
-  },
   transform: {
-    '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: 'tsconfig.jest.json' }],
-  },collectCoverage: true,
-  collectCoverageFrom: [
-    "src/**/*.{js,jsx,ts,tsx}",
-    "!src/**/*.d.ts",
-    "!src/**/__tests__/**"
-  ],
-}; 
+    '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest'
+  },
+  testEnvironment: 'jsdom',
+  moduleNameMapper: {
+    '^@/setupTests$': '<rootDir>/setupTests.ts',
+    '^@/(.*)$': '<rootDir>/src/$1'
+  },
+  setupFilesAfterEnv: ['<rootDir>/setupTests.ts'],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+  transformIgnorePatterns: ['/node_modules/']
+};
