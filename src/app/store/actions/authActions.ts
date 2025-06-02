@@ -6,7 +6,8 @@ import {
   setLoading,
   setError,
   initializeAuth
-} from '../slices/authSlice';
+} from '../slices/authSlice'; 
+
 
 export const loginUser = (data: LoginData) => async (dispatch: Dispatch) => {
     dispatch(setLoading(true));
