@@ -128,13 +128,14 @@ export const StudentForm = ({ student, onClose }: Props) => {
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form data-testid="student-form" onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-black-700">
+                            <label htmlFor="name" className="block text-sm font-medium text-black-700">
                                 Nombre Completo
                             </label>
                             <input
+                                id="name"
                                 type="text"
                                 name="name"
                                 value={formData.name}
@@ -144,10 +145,11 @@ export const StudentForm = ({ student, onClose }: Props) => {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-black-700">
+                            <label htmlFor="age" className="block text-sm font-medium text-black-700">
                                 Edad
                             </label>
                             <input
+                                id="age"
                                 type="number"
                                 name="age"
                                 value={formData.age}
@@ -160,10 +162,11 @@ export const StudentForm = ({ student, onClose }: Props) => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-black-700">
+                        <label htmlFor="email" className="block text-sm font-medium text-black-700">
                             Email
                         </label>
                         <input
+                            id="email"
                             type="email"
                             name="email"
                             value={formData.email}
@@ -175,10 +178,11 @@ export const StudentForm = ({ student, onClose }: Props) => {
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-black-700">
+                            <label htmlFor="gender" className="block text-sm font-medium text-black-700">
                                 Género
                             </label>
                             <select
+                                id="gender"
                                 name="gender"
                                 value={formData.gender}
                                 onChange={handleInputChange}
@@ -190,10 +194,11 @@ export const StudentForm = ({ student, onClose }: Props) => {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-black-700">
+                            <label htmlFor="nickname" className="block text-sm font-medium text-black-700">
                                 Nickname (Opcional)
                             </label>
                             <input
+                                id="nickname"
                                 type="text"
                                 name="nickname"
                                 value={formData.nickname}
@@ -267,6 +272,7 @@ export const StudentForm = ({ student, onClose }: Props) => {
                         <button
                             type="button"
                             onClick={onClose}
+                            data-testid="cancel-button"
                             className="px-4 py-2 border border-black-300 rounded-md shadow-sm text-sm font-medium text-black-700 bg-white hover:bg-black-50"
                         >
                             Cancelar
