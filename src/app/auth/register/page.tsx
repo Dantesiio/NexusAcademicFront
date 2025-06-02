@@ -85,7 +85,7 @@ export default function RegisterPage() {
                         </h2>
                     </div>
                     
-                    <form className="space-y-6" onSubmit={handleSubmit}>
+                    <form className="space-y-6" onSubmit={handleSubmit} data-testid="register-form">
                         <div>
                             <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
                                 Nombre Completo
