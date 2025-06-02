@@ -53,7 +53,7 @@ export default function StudentsPage() {
     if (loading && students.length === 0) {
         return (
             <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+                <div data-testid="loading-spinner" className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
             </div>
         );
     }
