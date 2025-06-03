@@ -1,25 +1,38 @@
-// src/setupTests.ts
 
-import '@testing-library/jest-dom'; // Extiende expect con matchers como toBeInTheDocument
+import '@testing-library/jest-dom';
+import { configure } from '@testing-library/react';
 import { jest } from '@jest/globals';
+import type { MockedFunction } from '@jest/globals';
 import * as reactRedux from 'react-redux';
 
-// Limpia los mocks antes de cada test para evitar interferencias entre ellos
-beforeEach(() => {
-  jest.clearAllMocks();
+// Configuración extendida de Testing Library
+configure({
+  testIdAttribute: 'data-testid',
+  asyncUtilTimeout: 5000
 });
 
-const mockDispatch = jest.fn();
-jest.mock('react-redux', () => {
-    const actual = jest.requireActual<typeof import('react-redux')>('react-redux');
-    return {
-      ...actual,
-      useDispatch: () => mockDispatch,
-      useSelector: jest.fn(() => ({ courses: [], loading: false })),
-    };
-  });
-  
+// Tipado para los mocks
+const mockDispatch = jest.fn() as MockedFunction<typeof reactRedux.useDispatch>;
+const mockUseSelector = jest.fn() as MockedFunction<typeof reactRedux.useSelector>;
 
+// Mock de react-redux con tipado fuerte
+jest.mock('react-redux', () => ({
+  ...jest.requireActual<typeof import('react-redux')>('react-redux'),
+  useDispatch: () => mockDispatch,
+  useSelector: mockUseSelector.mockImplementation(() => ({ 
+    courses: [], 
+    loading: false 
+  })),
+}));
 
-// Exporta mockDispatch para usarlo fácilmente en tus tests
-export { mockDispatch };
+// Limpieza de mocks antes de cada test
+beforeEach(() => {
+  jest.clearAllMocks();
+  // Configuración por defecto para useSelector
+  mockUseSelector.mockImplementation(() => ({ 
+    courses: [], 
+    loading: false 
+  }));
+});
+
+export { mockDispatch, mockUseSelector };
