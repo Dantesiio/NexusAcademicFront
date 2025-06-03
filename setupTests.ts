@@ -2,8 +2,9 @@
 import '@testing-library/jest-dom';
 import { configure } from '@testing-library/react';
 import { jest } from '@jest/globals';
-import type { MockedFunction } from '@jest/globals';
 import * as reactRedux from 'react-redux';
+import type { MockedFunction } from '@jest/globals';
+
 
 // Configuración extendida de Testing Library
 configure({
