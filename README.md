@@ -199,6 +199,8 @@ A continuación, se detalla cómo este proyecto frontend satisface cada uno de l
     4. Pruebas E2E.
     5. Build de producción.
     6. Despliegue automático a Vercel si todos los pasos anteriores son exitosos en la rama principal.
+    7. El despliegue quedó en el siguiente link: [Despliegue en Vercel](https://nexusfrontt-hvunc3dj2-jhonatancis-projects.vercel.app/auth/login)
+   Con los siguientes credenciales: Correo: admin@nexus.com - Contraseña: Admin123
 
 ### 8. Pruebas (10%)
 
