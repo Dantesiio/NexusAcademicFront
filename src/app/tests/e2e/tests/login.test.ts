@@ -22,14 +22,15 @@ describe('Login Tests', () => {
       console.log('Navigated to login page');
 
       // 2) Ingresar email y password válidos
-      await loginPage.enterCredentials('admin@example.com', 'strongPassword');
+      await loginPage.enterCredentials('admin@nexus.com', 'Admin123');
       console.log('Credentials entered');
 
       // 3) Enviar el formulario de login
       await loginPage.submitLogin();
       console.log('Login submitted');
 
-    
+      // 4) Esperar a que la URL incluya '/dashboard' (en vez de '/dashboard/main')
+      //    porque tu aplicación podría redirigir simplemente a /dashboard
       await driver.wait(
         async () => {
           const url = await driver.getCurrentUrl();

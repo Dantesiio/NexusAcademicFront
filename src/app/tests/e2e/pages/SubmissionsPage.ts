@@ -26,15 +26,50 @@ export class SubmissionsPage {
   }
 
   /**
+   * Establece el filtro de estado
+   * @param status 'ALL' | 'GRADED' | 'PENDING'
+   */
+  async setStatusFilter(status: 'ALL' | 'GRADED' | 'PENDING') {
+    const filterSelect = await this.driver.findElement(
+      By.css('select[aria-label="Filtrar por estado de entrega"]')
+    );
+    await filterSelect.click();
+    const option = await this.driver.findElement(
+      By.css(`option[value="${status}"]`)
+    );
+    await option.click();
+  }
+
+  /**
+   * Espera a que el grid se actualice después de aplicar filtros
+   */
+  async waitForGridRefresh() {
+    try {
+      const spinner = await this.driver.findElement(
+        By.css('[data-testid="loading-spinner"]')
+      );
+      await this.driver.wait(
+        async () => !(await spinner.isDisplayed()),
+        15000,
+        'Loading spinner did not disappear'
+      );
+    } catch (e) {
+      // Si no hay spinner, continuar normalmente
+      console.log('No loading spinner found, continuing');
+    }
+    
+    await this.waitForGrid();
+  }
+
+  /**
    * Obtiene el ID de la primera tarjeta de envío en el grid.
    */
   async getFirstSubmissionId(): Promise<string> {
     await this.waitForGrid();
     const firstCard = await this.driver.findElement(
-      By.css('[data-testid="submissions-grid"] > div:first-child')
+      By.css('[data-testid^="submission-card-"]')
     );
     
-    // Corregido: Primero obtener el atributo, luego aplicar replace
     const attributeValue = await firstCard.getAttribute('data-testid');
     return attributeValue.replace('submission-card-', '');
   }
@@ -49,7 +84,7 @@ export class SubmissionsPage {
     );
     
     const calificarBtn = await card.findElement(
-      By.xpath('.//button[contains(text(), "Calificar")]')
+      By.css('[data-testid="grade-button"]')
     );
     
     // Desplazar y hacer clic con JavaScript
@@ -92,7 +127,7 @@ export class SubmissionsPage {
    */
   async submitGrade() {
     const submitBtn = await this.driver.findElement(
-      By.xpath(`//div[@data-testid="grading-modal"]//button[contains(text(), "Calificar")]`)
+      By.css('[data-testid="grading-modal"] [data-testid="submit-grade-btn"]')
     );
     await submitBtn.click();
   }

@@ -42,15 +42,23 @@ describe('Submission Grading Test', () => {
     await submissionsPage.waitForGrid();
     console.log('Submissions grid is visible');
 
-    // 5) Obtener ID de la primera entrega pendiente
+    // 5) Filtrar por entregas pendientes
+    await submissionsPage.setStatusFilter('PENDING');
+    console.log('Filtered to pending submissions');
+
+    // 6) Esperar a que se actualice el grid
+    await submissionsPage.waitForGridRefresh();
+    console.log('Grid refreshed with pending submissions');
+
+    // 7) Obtener ID de la primera entrega pendiente
     const firstSubmissionId = await submissionsPage.getFirstSubmissionId();
     console.log('First submission ID:', firstSubmissionId);
 
-    // 6) Hacer clic en “Calificar” de la primera entrega pendiente
+    // 8) Hacer clic en “Calificar” de la primera entrega pendiente
     await submissionsPage.clickCalificarForSubmission(firstSubmissionId);
     console.log('Clicked "Calificar" on first pending submission');
 
-    // 7) Ingresar calificación y comentarios en el modal
+    // 9) Ingresar calificación y comentarios en el modal
     const testGrade = '4.5';
     const testComments = 'Buen trabajo';
 
@@ -60,11 +68,11 @@ describe('Submission Grading Test', () => {
     await submissionsPage.enterComments(testComments);
     console.log('Entered comments:', testComments);
 
-    // 8) Enviar el formulario de calificación
+    // 10) Enviar el formulario de calificación
     await submissionsPage.submitGrade();
     console.log('Submitted grading form');
 
-    // 9) Esperar a que se cierre el modal
+    // 11) Esperar a que se cierre el modal
     await submissionsPage.waitForModalToClose();
     console.log('Grading modal closed');
 
