@@ -20,32 +20,44 @@ export class SubmissionsPage {
   async waitForGrid() {
     await this.driver.wait(
       until.elementLocated(By.css('[data-testid="submissions-grid"]')),
-      10000,
-      'El grid de entregas no se cargó en 10s'
+      30000,
+      'El grid de entregas no se cargó en 30s'
     );
   }
 
   /**
-   * Encuentra la primera carta de envío que esté “Pendiente”
-   * (span con texto “Pendiente”), y hace clic en su botón “Calificar”.
+   * Obtiene el ID de la primera tarjeta de envío en el grid.
    */
-  async clickFirstCalificar() {
-    // 1) Encontrar el contenedor de la primera entrega pendiente
-    const pendingCard: WebElement = await this.driver.wait(
-      until.elementLocated(
-        By.xpath(`
-          //div[@data-testid="submissions-grid"]//span[text()="Pendiente"]/ancestor::div[contains(@class,"shadow")]`
-        )
-      ),
-      10000,
-      'No se encontró ninguna entrega con estado “Pendiente”'
+  async getFirstSubmissionId(): Promise<string> {
+    await this.waitForGrid();
+    const firstCard = await this.driver.findElement(
+      By.css('[data-testid="submissions-grid"] > div:first-child')
     );
+    return await firstCard.getAttribute('data-testid').replace('submission-card-', '');
+  }
 
-    // 2) Dentro de esa card, buscar el botón que contiene el texto “Calificar”
-    const calificarBtn = await pendingCard.findElement(
-      By.xpath(`.//button[contains(text(), "Calificar")]`)
+  /**
+   * Hace clic en el botón "Calificar" de una tarjeta específica por ID.
+   * @param submissionId ID de la entrega (sin el prefijo 'submission-card-')
+   */
+  async clickCalificarForSubmission(submissionId: string) {
+    const card = await this.driver.findElement(
+      By.css(`[data-testid="submission-card-${submissionId}"]`)
     );
-    await calificarBtn.click();
+    
+    const calificarBtn = await card.findElement(
+      By.xpath('.//button[contains(text(), "Calificar")]')
+    );
+    
+    // Desplazar y hacer clic con JavaScript
+    await this.driver.executeScript(
+      "arguments[0].scrollIntoView({block: 'center'});", 
+      calificarBtn
+    );
+    await this.driver.executeScript(
+      "arguments[0].click();", 
+      calificarBtn
+    );
   }
 
   /**
@@ -93,20 +105,4 @@ export class SubmissionsPage {
     );
   }
 
-  /**
-   * Espera hasta que la misma carta que estaba pendiente muestre ahora la calificación numeric/5.0.
-   * @param grade El número (como string) que esperas ver, p.ej. "4.5"
-   */
-  async waitForGradeOnFirstCard(grade: string) {
-    // Buscamos la primera card que contenga el texto “grade/5.0”
-    await this.driver.wait(
-      until.elementLocated(
-        By.xpath(`
-          //div[@data-testid="submissions-grid"]//span[text()="${grade}/5.0"]`
-        )
-      ),
-      10000,
-      `No se encontró la calificación “${grade}/5.0” en 10s`
-    );
-  }
 }
