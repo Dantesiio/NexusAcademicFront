@@ -1,12 +1,16 @@
 'use client'
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../store';
+import { getStudents } from '../../store/actions/studentActions';
+import { getCourses } from '../../store/actions/courseActions';
+import { getSubmissions } from '../../store/actions/submissionActions';
 import { 
     IoPersonOutline, 
     IoBookOutline, 
     IoDocumentTextOutline,
     IoStatsChartOutline,
-    IoLogOutOutline
+    IoCheckmarkCircleOutline
 } from 'react-icons/io5';
 
 // Forzar renderizado dinámico
@@ -17,9 +21,10 @@ interface StatCardProps {
     value: number;
     icon: React.ReactNode;
     color: string;
+    subtitle?: string;
 }
 
-const StatCard = ({ title, value, icon, color }: StatCardProps) => (
+const StatCard = ({ title, value, icon, color, subtitle }: StatCardProps) => (
     <div className="bg-white rounded-lg shadow p-6">
         <div className="flex items-center">
             <div className={`flex-shrink-0 ${color}`}>
@@ -35,6 +40,11 @@ const StatCard = ({ title, value, icon, color }: StatCardProps) => (
                     <dd className="text-lg font-medium text-gray-900">
                         {value}
                     </dd>
+                    {subtitle && (
+                        <dd className="text-xs text-gray-500">
+                            {subtitle}
+                        </dd>
+                    )}
                 </dl>
             </div>
         </div>
@@ -42,9 +52,13 @@ const StatCard = ({ title, value, icon, color }: StatCardProps) => (
 );
 
 export default function MainPage() {
-    const router = useRouter();
+    const dispatch = useDispatch<AppDispatch>();
+    const { user } = useSelector((state: RootState) => state.auth);
+    const { students } = useSelector((state: RootState) => state.students);
+    const { courses } = useSelector((state: RootState) => state.courses);
+    const { submissions } = useSelector((state: RootState) => state.submissions);
+
     const [isClient, setIsClient] = useState(false);
-    const [user, setUser] = useState({ fullName: 'Administrador' });
 
     useEffect(() => {
         setIsClient(true);
@@ -52,17 +66,12 @@ export default function MainPage() {
 
     useEffect(() => {
         if (isClient) {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                router.push('/auth/login');
-            }
+            // Cargar datos reales del backend
+            dispatch(getStudents({ limit: 1000, offset: 0 }));
+            dispatch(getCourses());
+            dispatch(getSubmissions());
         }
-    }, [isClient, router]);
-
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        router.push('/auth/login');
-    };
+    }, [isClient, dispatch]);
 
     if (!isClient) {
         return (
@@ -72,133 +81,114 @@ export default function MainPage() {
         );
     }
 
+    // Calcular estadísticas reales
+    const totalStudents = students.length;
+    const activeCourses = courses.filter(c => c.status === 'ACTIVE').length;
+    const totalSubmissions = submissions.length;
+    const gradedSubmissions = submissions.filter(s => s.grade !== null).length;
+    const pendingSubmissions = totalSubmissions - gradedSubmissions;
+
     return (
         <div className="min-h-screen bg-gray-100">
-            {/* Header */}
-            <nav className="bg-white shadow-sm">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between h-16">
-                        <div className="flex items-center">
-                            <h1 className="text-xl font-bold text-gray-900">
-                                Nexus<span className="text-blue-500">Academic</span>
-                            </h1>
-                        </div>
-                        <div className="flex items-center space-x-4">
-                            <span className="text-sm text-gray-700">
-                                Bienvenido, {user.fullName}
-                            </span>
-                            <button
-                                onClick={handleLogout}
-                                className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
-                            >
-                                <IoLogOutOutline className="h-4 w-4 mr-1" />
-                                Salir
-                            </button>
+            <div className="p-6">
+                {/* Header de Bienvenida */}
+                <div className="mb-8 text-center">
+                    <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                        ¡Bienvenido a Nexus<span className="text-blue-500">Academic</span>!
+                    </h1>
+                    <div className="max-w-4xl mx-auto">
+                        <p className="text-xl text-gray-600 mb-4">
+                            Sistema integral de gestión académica diseñado para facilitar la administración de cursos, estudiantes y entregas.
+                        </p>
+                        <div className="bg-white p-6 rounded-lg shadow-sm">
+                            <h2 className="text-lg font-semibold text-gray-800 mb-3">¿Qué puedes hacer con NexusAcademic?</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+                                <div className="flex items-center">
+                                    <IoPersonOutline className="h-5 w-5 text-blue-500 mr-2" />
+                                    <span>Gestionar estudiantes y sus matrículas</span>
+                                </div>
+                                <div className="flex items-center">
+                                    <IoBookOutline className="h-5 w-5 text-green-500 mr-2" />
+                                    <span>Administrar cursos y profesores</span>
+                                </div>
+                                <div className="flex items-center">
+                                    <IoDocumentTextOutline className="h-5 w-5 text-purple-500 mr-2" />
+                                    <span>Revisar y calificar entregas</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </nav>
 
-            {/* Main Content */}
-            <div className="p-6">
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">
-                        ¡Hola, {user.fullName}!
-                    </h1>
-                    <p className="text-gray-600 mt-2">
-                        Bienvenido al sistema de gestión académica
-                    </p>
-                </div>
-
-                {/* Stats Cards */}
+                {/* Estadísticas Reales */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     <StatCard
-                        title="Total Estudiantes"
-                        value={25}
+                        title="Estudiantes"
+                        value={totalStudents}
+                        subtitle="Total registrados"
                         icon={<IoPersonOutline />}
                         color="text-blue-600"
                     />
                     <StatCard
                         title="Cursos Activos"
-                        value={8}
+                        value={activeCourses}
+                        subtitle={`${courses.length} total`}
                         icon={<IoBookOutline />}
                         color="text-green-600"
                     />
                     <StatCard
-                        title="Entregas Pendientes"
-                        value={12}
+                        title="Entregas"
+                        value={totalSubmissions}
+                        subtitle={`${pendingSubmissions} pendientes`}
                         icon={<IoDocumentTextOutline />}
-                        color="text-yellow-600"
+                        color="text-purple-600"
                     />
                     <StatCard
-                        title="Estudiantes Activos"
-                        value={20}
-                        icon={<IoStatsChartOutline />}
-                        color="text-purple-600"
+                        title="Calificadas"
+                        value={gradedSubmissions}
+                        subtitle="Entregas revisadas"
+                        icon={<IoCheckmarkCircleOutline />}
+                        color="text-yellow-600"
                     />
                 </div>
 
-                {/* Quick Actions */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Información del Usuario Actual */}
+                {user && (
                     <div className="bg-white rounded-lg shadow p-6">
-                        <h2 className="text-lg font-medium text-gray-900 mb-4">
-                            Acciones Rápidas
+                        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                            Información de tu cuenta
                         </h2>
-                        <div className="space-y-3">
-                            <button className="w-full text-left px-4 py-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                                <div className="flex items-center">
-                                    <IoPersonOutline className="h-5 w-5 text-blue-600 mr-3" />
-                                    <span className="text-sm font-medium text-gray-900">Gestionar Estudiantes</span>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-500">Nombre</label>
+                                <p className="text-lg text-gray-900">{user.fullName}</p>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-500">Email</label>
+                                <p className="text-lg text-gray-900">{user.email}</p>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-500">Roles</label>
+                                <div className="flex flex-wrap gap-2 mt-1">
+                                    {user.roles.map((role, index) => (
+                                        <span 
+                                            key={index}
+                                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                                        >
+                                            {role}
+                                        </span>
+                                    ))}
                                 </div>
-                            </button>
-                            <button className="w-full text-left px-4 py-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-                                <div className="flex items-center">
-                                    <IoBookOutline className="h-5 w-5 text-green-600 mr-3" />
-                                    <span className="text-sm font-medium text-gray-900">Administrar Cursos</span>
-                                </div>
-                            </button>
-                            <button className="w-full text-left px-4 py-3 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition-colors">
-                                <div className="flex items-center">
-                                    <IoDocumentTextOutline className="h-5 w-5 text-yellow-600 mr-3" />
-                                    <span className="text-sm font-medium text-gray-900">Revisar Entregas</span>
-                                </div>
-                            </button>
+                            </div>
                         </div>
                     </div>
+                )}
 
-                    <div className="bg-white rounded-lg shadow p-6">
-                        <h2 className="text-lg font-medium text-gray-900 mb-4">
-                            Actividad Reciente
-                        </h2>
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between border-b pb-2">
-                                <div>
-                                    <h3 className="text-sm font-medium text-gray-900">
-                                        Juan Pérez
-                                    </h3>
-                                    <p className="text-sm text-gray-500">
-                                        Entregó tarea de Programación
-                                    </p>
-                                </div>
-                                <span className="text-sm text-yellow-600">
-                                    Pendiente
-                                </span>
-                            </div>
-                            <div className="flex items-center justify-between border-b pb-2">
-                                <div>
-                                    <h3 className="text-sm font-medium text-gray-900">
-                                        María González
-                                    </h3>
-                                    <p className="text-sm text-gray-500">
-                                        Completó examen de Base de Datos
-                                    </p>
-                                </div>
-                                <span className="text-sm font-medium text-green-600">
-                                    4.5/5.0
-                                </span>
-                            </div>
-                        </div>
-                    </div>
+                {/* Mensaje motivacional */}
+                <div className="mt-8 text-center">
+                    <p className="text-gray-600">
+                        Utiliza el menú lateral para navegar entre las diferentes secciones del sistema.
+                    </p>
                 </div>
             </div>
         </div>
