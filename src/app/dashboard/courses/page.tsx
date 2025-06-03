@@ -61,7 +61,7 @@ export default function CoursesPage() {
     if (loading && courses.length === 0) {
         return (
             <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+                <div data-testid="loading-spinner"  className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
             </div>
         );
     }
@@ -103,7 +103,7 @@ export default function CoursesPage() {
                         </div>
                         <div className="flex items-center space-x-2">
                             <IoFilterOutline className="h-5 w-5 text-black-400" />
-                            <select
+                            <select aria-label="Filtrar por estado"
                                 value={statusFilter}
                                 onChange={(e) => setStatusFilter(e.target.value as 'ALL' | 'ACTIVE' | 'INACTIVE')}
                                 className="border border-black-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"

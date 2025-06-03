@@ -78,7 +78,7 @@ export default function SubmissionsPage() {
     if (loading && submissions.length === 0) {
         return (
             <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+                <div data-testid="loading-spinner" className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
             </div>
         );
     }
@@ -107,6 +107,7 @@ export default function SubmissionsPage() {
                         </div>
                     </div>
                     <select
+                        aria-label="Filtrar por estado de entrega"
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value as 'ALL' | 'GRADED' | 'PENDING')}
                         className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
@@ -124,7 +125,7 @@ export default function SubmissionsPage() {
                     </div>
                 )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div data-testid="submissions-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredSubmissions.map((submission) => (
                         <div key={submission.id} className="bg-white overflow-hidden shadow rounded-lg">
                             <div className="px-4 py-5 sm:p-6">
@@ -207,17 +208,18 @@ export default function SubmissionsPage() {
 
                 {/* Modal de Calificación */}
                 {gradingSubmission && (
-                    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+                    <div data-testid="grading-modal" className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
                         <div className="relative top-20 mx-auto p-5 border max-w-md shadow-lg rounded-md bg-white">
                             <h3 className="text-lg font-bold text-gray-900 mb-4">
                                 Calificar Entrega
                             </h3>
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">
+                                    <label htmlFor="submissionGrade" className="block text-sm font-medium text-gray-700">
                                         Calificación (0-5)
                                     </label>
                                     <input
+                                    id="submissionGrade"
                                         type="number"
                                         min="0"
                                         max="5"
@@ -228,10 +230,11 @@ export default function SubmissionsPage() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">
+                                    <label htmlFor="submissionComments" className="block text-sm font-medium text-gray-700">
                                         Comentarios
                                     </label>
                                     <textarea
+                                         id="submissionComments"
                                         value={gradeData.comments}
                                         onChange={(e) => setGradeData(prev => ({...prev, comments: e.target.value}))}
                                         rows={3}
