@@ -80,22 +80,35 @@ export default function AnalyticsPage() {
     const totalStudents = students.length;
     const activeCourses = courses.filter(c => c.status === 'ACTIVE').length;
     const totalSubmissions = submissions.length;
-    const gradedSubmissions = submissions.filter(s => s.grade !== null).length;
+    
+    //Convertir explícitamente a números y filtrar valores inválidos
+    const validGrades = submissions
+        .filter(s => s.grade !== null && s.grade !== undefined)
+        .map(s => {
+            const numericGrade = parseFloat(String(s.grade));
+            return isNaN(numericGrade) ? null : numericGrade;
+        })
+        .filter(grade => grade !== null) as number[];
+    
+    console.log('Debug grades:', validGrades); // ← Para debugging
+    
+    const gradedSubmissions = validGrades.length;
     const pendingSubmissions = totalSubmissions - gradedSubmissions;
     
-    // Promedio de calificaciones
-    const grades = submissions.filter(s => s.grade !== null).map(s => s.grade as number);
-    const averageGrade = grades.length > 0 ? (grades.reduce((a, b) => a + b, 0) / grades.length).toFixed(2) : '0';
+    // Solo usar grades válidos
+    const averageGrade = validGrades.length > 0 
+        ? (validGrades.reduce((sum, grade) => sum + grade, 0) / validGrades.length).toFixed(2)
+        : '0.00';
     
     // Estudiantes activos (con al menos una matrícula)
     const activeStudents = students.filter(s => s.enrollments && s.enrollments.length > 0).length;
     
-    // Distribución de calificaciones
+   // Usar validGrades
     const gradeDistribution = {
-        excellent: grades.filter(g => g >= 4.5).length,
-        good: grades.filter(g => g >= 3.5 && g < 4.5).length,
-        regular: grades.filter(g => g >= 3.0 && g < 3.5).length,
-        poor: grades.filter(g => g < 3.0).length,
+        excellent: validGrades.filter(g => g >= 4.5).length,
+        good: validGrades.filter(g => g >= 3.5 && g < 4.5).length,
+        regular: validGrades.filter(g => g >= 3.0 && g < 3.5).length,
+        poor: validGrades.filter(g => g < 3.0).length,
     };
 
     return (
@@ -151,7 +164,7 @@ export default function AnalyticsPage() {
                                     <span className="text-sm text-black-600">Excelente (4.5-5.0)</span>
                                 </div>
                                 <span className="text-sm font-medium text-black-900">
-                                    {gradeDistribution.excellent} ({grades.length > 0 ? Math.round((gradeDistribution.excellent / grades.length) * 100) : 0}%)
+                                    {gradeDistribution.excellent} ({validGrades.length > 0 ? Math.round((gradeDistribution.excellent / validGrades.length) * 100) : 0}%)
                                 </span>
                             </div>
                             <div className="flex items-center justify-between">
@@ -160,7 +173,7 @@ export default function AnalyticsPage() {
                                     <span className="text-sm text-black-600">Bueno (3.5-4.4)</span>
                                 </div>
                                 <span className="text-sm font-medium text-black-900">
-                                    {gradeDistribution.good} ({grades.length > 0 ? Math.round((gradeDistribution.good / grades.length) * 100) : 0}%)
+                                    {gradeDistribution.good} ({validGrades.length > 0 ? Math.round((gradeDistribution.good / validGrades.length) * 100) : 0}%)
                                 </span>
                             </div>
                             <div className="flex items-center justify-between">
@@ -169,7 +182,7 @@ export default function AnalyticsPage() {
                                     <span className="text-sm text-black-600">Regular (3.0-3.4)</span>
                                 </div>
                                 <span className="text-sm font-medium text-black-900">
-                                    {gradeDistribution.regular} ({grades.length > 0 ? Math.round((gradeDistribution.regular / grades.length) * 100) : 0}%)
+                                    {gradeDistribution.regular} ({validGrades.length > 0 ? Math.round((gradeDistribution.regular / validGrades.length) * 100) : 0}%)
                                 </span>
                             </div>
                             <div className="flex items-center justify-between">
@@ -178,7 +191,7 @@ export default function AnalyticsPage() {
                                     <span className="text-sm text-black-600">Deficiente (&lt;3.0)</span>
                                 </div>
                                 <span className="text-sm font-medium text-black-900">
-                                    {gradeDistribution.poor} ({grades.length > 0 ? Math.round((gradeDistribution.poor / grades.length) * 100) : 0}%)
+                                    {gradeDistribution.poor} ({validGrades.length > 0 ? Math.round((gradeDistribution.poor / validGrades.length) * 100) : 0}%)
                                 </span>
                             </div>
                         </div>
@@ -192,9 +205,18 @@ export default function AnalyticsPage() {
                         <div className="space-y-4">
                             {courses.slice(0, 5).map(course => {
                                 const courseSubmissions = submissions.filter(s => s.course.id === course.id);
-                                const courseGrades = courseSubmissions.filter(s => s.grade !== null);
-                                const courseAverage = courseGrades.length > 0 
-                                    ? (courseGrades.reduce((sum, s) => sum + (s.grade as number), 0) / courseGrades.length).toFixed(1)
+                                
+                                // Calcular promedio por curso correctamente
+                                const courseValidGrades = courseSubmissions
+                                    .filter(s => s.grade !== null && s.grade !== undefined)
+                                    .map(s => {
+                                        const numericGrade = parseFloat(String(s.grade));
+                                        return isNaN(numericGrade) ? null : numericGrade;
+                                    })
+                                    .filter(grade => grade !== null) as number[];
+                                
+                                const courseAverage = courseValidGrades.length > 0 
+                                    ? (courseValidGrades.reduce((sum, grade) => sum + grade, 0) / courseValidGrades.length).toFixed(1)
                                     : '-';
                                 
                                 return (
