@@ -33,7 +33,10 @@ export class SubmissionsPage {
     const firstCard = await this.driver.findElement(
       By.css('[data-testid="submissions-grid"] > div:first-child')
     );
-    return await firstCard.getAttribute('data-testid').replace('submission-card-', '');
+    
+    // Corregido: Primero obtener el atributo, luego aplicar replace
+    const attributeValue = await firstCard.getAttribute('data-testid');
+    return attributeValue.replace('submission-card-', '');
   }
 
   /**
@@ -98,11 +101,11 @@ export class SubmissionsPage {
    * Espera a que desaparezca el modal de calificación (data-testid="grading-modal").
    */
   async waitForModalToClose() {
+    const modalElement = await this.driver.findElement(By.css('[data-testid="grading-modal"]'));
     await this.driver.wait(
-      until.stalenessOf(await this.driver.findElement(By.css('[data-testid="grading-modal"]'))),
+      until.stalenessOf(modalElement),
       10000,
       'El modal de calificación no se cerró en 10s'
     );
   }
-
 }

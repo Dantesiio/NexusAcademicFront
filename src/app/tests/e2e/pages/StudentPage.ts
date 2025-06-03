@@ -71,20 +71,26 @@ export class StudentPage {
 
   /**
    * Una vez hecha click en “Agregar Matrícula”, espera a que aparezca
-   * el primer bloque de matrícula y lo devuelve.
+   * el bloque de matrícula en la posición index (0-based) y lo devuelve.
    */
   private async waitForEnrollmentBlock(index: number): Promise<WebElement> {
-    // Esperar a que haya al menos (index+1) bloques de matrícula:
-    return await this.driver.wait(
+    // Primero esperamos que haya al menos (index+1) bloques
+    await this.driver.wait(
       async () => {
         const blocks = await this.driver.findElements(
           By.css('div.mt-2.p-3.border.rounded-md.bg-black-50')
         );
-        return blocks.length > index ? blocks[index] : null;
+        return blocks.length > index;
       },
       5000,
       `No se creó el bloque de matrícula #${index} en 5s`
     );
+    
+    // Luego obtenemos el bloque específico
+    const blocks = await this.driver.findElements(
+      By.css('div.mt-2.p-3.border.rounded-md.bg-black-50')
+    );
+    return blocks[index];
   }
 
   /**
@@ -165,6 +171,6 @@ export class StudentPage {
     // Obtener la sexta celda (índice 5)
     const tds = await row.findElements(By.tagName('td'));
     const enrollCountText = await tds[5].getText();
-    return parseInt(enrollCountText, 10);
-  }
+    return parseInt(enrollCountText, 10);
+  }
 }

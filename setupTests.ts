@@ -1,10 +1,7 @@
-
 import '@testing-library/jest-dom';
 import { configure } from '@testing-library/react';
 import { jest } from '@jest/globals';
 import * as reactRedux from 'react-redux';
-import type { MockedFunction } from '@jest/globals';
-
 
 // Configuración extendida de Testing Library
 configure({
@@ -12,13 +9,13 @@ configure({
   asyncUtilTimeout: 5000
 });
 
-// Tipado para los mocks
-const mockDispatch = jest.fn() as MockedFunction<typeof reactRedux.useDispatch>;
-const mockUseSelector = jest.fn() as MockedFunction<typeof reactRedux.useSelector>;
+// Tipado simplificado
+const mockDispatch = jest.fn();
+const mockUseSelector = jest.fn();
 
-// Mock de react-redux con tipado fuerte
+// Mock de react-redux
 jest.mock('react-redux', () => ({
-  ...jest.requireActual<typeof import('react-redux')>('react-redux'),
+  ...jest.requireActual('react-redux') as typeof reactRedux,
   useDispatch: () => mockDispatch,
   useSelector: mockUseSelector.mockImplementation(() => ({ 
     courses: [], 
@@ -29,7 +26,6 @@ jest.mock('react-redux', () => ({
 // Limpieza de mocks antes de cada test
 beforeEach(() => {
   jest.clearAllMocks();
-  // Configuración por defecto para useSelector
   mockUseSelector.mockImplementation(() => ({ 
     courses: [], 
     loading: false 
