@@ -64,11 +64,27 @@ Este frontend implementa todas las funcionalidades críticas requeridas, incluye
 
 4. **Iniciar el servidor de desarrollo:**
 
+   Para desarrollo (con hot-reloading):
    ```bash
    pnpm dev
+   # o
+   npm run dev
    ```
-
    La aplicación estará disponible en [http://localhost:3000](http://localhost:3000).
+
+   Para ejecutar un build de producción localmente:
+   ```bash
+   # 1. Construir la aplicación
+   pnpm build
+   # o
+   npm run build
+
+   # 2. Iniciar el servidor de producción
+   pnpm start
+   # o
+   npm start
+   ```
+   La aplicación construida también estará disponible en [http://localhost:3000](http://localhost:3000) por defecto.
 
 ---
 
