@@ -1,27 +1,37 @@
-// tests/e2e/pages/LoginPage.ts
-import { Builder, By, until, WebDriver } from 'selenium-webdriver';
+import { By, until, WebDriver } from 'selenium-webdriver';
 
 export class LoginPage {
   private driver: WebDriver;
+  private baseUrl = 'http://localhost:3001';
 
   constructor(driver: WebDriver) {
     this.driver = driver;
   }
 
+  /** Navega a http://localhost:3001/auth/login */
   async navigateToLogin() {
-    await this.driver.get('http://localhost:3000/auth/login');
+    await this.driver.get(this.baseUrl + '/auth/login');
   }
 
+  /** Ingresa email y password en los inputs con id="email" y id="password" */
   async enterCredentials(email: string, password: string) {
-    await this.driver.findElement(By.id('email')).sendKeys(email);
-    await this.driver.findElement(By.id('password')).sendKeys(password);
+    const emailInput = await this.driver.findElement(By.id('email'));
+    await emailInput.clear();
+    await emailInput.sendKeys(email);
+
+    const passwordInput = await this.driver.findElement(By.id('password'));
+    await passwordInput.clear();
+    await passwordInput.sendKeys(password);
   }
 
+  /** Hace clic en el botón submit (button[type="submit"]) */
   async submitLogin() {
-    await this.driver.findElement(By.css('button[type="submit"]')).click();
+    const submitBtn = await this.driver.findElement(By.css('button[type="submit"]'));
+    await submitBtn.click();
   }
 
-  async getErrorMessage() {
+  /** Devuelve el texto del mensaje de error si aparece */
+  async getErrorMessage(): Promise<string> {
     const errorElement = await this.driver.wait(
       until.elementLocated(By.css('.error-message')),
       5000
@@ -29,7 +39,12 @@ export class LoginPage {
     return errorElement.getText();
   }
 
-  async isDashboardVisible() {
+  /**
+   * Espera hasta 5s a que exista un elemento con id="dashboard-header",
+   * que asumimos es un <h1 id="dashboard-header">Dashboard</h1> o similar.
+   * Si lo encuentra, devuelve true; si se agota el timeout, devuelve false.
+   */
+  async isDashboardVisible(): Promise<boolean> {
     try {
       await this.driver.wait(
         until.elementLocated(By.id('dashboard-header')),
@@ -38,6 +53,6 @@ export class LoginPage {
       return true;
     } catch {
       return false;
-    }
-  }
+    }
+  }
 }
